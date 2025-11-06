@@ -7,6 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -806,7 +808,7 @@
             </select>
             <button class="btn btn-primary" id="login-btn">Entrar</button>
             <p style="text-align: center; margin-top: 15px; color: var(--dark-gray); font-size: 0.9rem;">
-                Solicite seu login
+                Admin: admin / admin123
             </p>
         </div>
     </div>
@@ -1331,15 +1333,129 @@
     </div>
 
     <script>
-        // Sistema de armazenamento local
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmZfB2QfL9G6qY7w8XbHjKpLmNtRvW6Uc",
+            authDomain: "controleepi-6ccc3.firebaseapp.com",
+            projectId: "controleepi-6ccc3",
+            storageBucket: "controleepi-6ccc3.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Inicializar Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (error) {
+            console.log('Firebase já inicializado');
+        }
+        const db = firebase.firestore();
+
+        // Sistema de armazenamento com Firebase
         const Storage = {
-            save(key, data) {
-                localStorage.setItem(key, JSON.stringify(data));
+            // Usuários
+            async saveUsers(users) {
+                try {
+                    await db.collection('appData').doc('users').set({ data: users });
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar usuários:', error);
+                    return false;
+                }
             },
 
-            load(key) {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : [];
+            async loadUsers() {
+                try {
+                    const doc = await db.collection('appData').doc('users').get();
+                    return doc.exists ? doc.data().data : [];
+                } catch (error) {
+                    console.error('Erro ao carregar usuários:', error);
+                    return [];
+                }
+            },
+
+            // EPIs
+            async saveEpis(epis) {
+                try {
+                    await db.collection('appData').doc('epis').set({ data: epis });
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar EPIs:', error);
+                    return false;
+                }
+            },
+
+            async loadEpis() {
+                try {
+                    const doc = await db.collection('appData').doc('epis').get();
+                    return doc.exists ? doc.data().data : [];
+                } catch (error) {
+                    console.error('Erro ao carregar EPIs:', error);
+                    return [];
+                }
+            },
+
+            // Estoque
+            async saveStock(stock) {
+                try {
+                    await db.collection('appData').doc('stock').set({ data: stock });
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar estoque:', error);
+                    return false;
+                }
+            },
+
+            async loadStock() {
+                try {
+                    const doc = await db.collection('appData').doc('stock').get();
+                    return doc.exists ? doc.data().data : [];
+                } catch (error) {
+                    console.error('Erro ao carregar estoque:', error);
+                    return [];
+                }
+            },
+
+            // Entregas
+            async saveDeliveries(deliveries) {
+                try {
+                    await db.collection('appData').doc('deliveries').set({ data: deliveries });
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar entregas:', error);
+                    return false;
+                }
+            },
+
+            async loadDeliveries() {
+                try {
+                    const doc = await db.collection('appData').doc('deliveries').get();
+                    return doc.exists ? doc.data().data : [];
+                } catch (error) {
+                    console.error('Erro ao carregar entregas:', error);
+                    return [];
+                }
+            },
+
+            // Ações
+            async saveActions(actions) {
+                try {
+                    await db.collection('appData').doc('actions').set({ data: actions });
+                    return true;
+                } catch (error) {
+                    console.error('Erro ao salvar ações:', error);
+                    return false;
+                }
+            },
+
+            async loadActions() {
+                try {
+                    const doc = await db.collection('appData').doc('actions').get();
+                    return doc.exists ? doc.data().data : [];
+                } catch (error) {
+                    console.error('Erro ao carregar ações:', error);
+                    return [];
+                }
             },
 
             generateId() {
@@ -1354,24 +1470,25 @@
             currentUserRole: 'user',
             editingId: null,
             
-            // Dados
-            users: Storage.load('users') || [],
-            epis: Storage.load('epis') || [],
-            stock: Storage.load('stock') || [],
-            deliveries: Storage.load('deliveries') || [],
-            actions: Storage.load('actions') || [],
+            // Dados - serão carregados do Firebase
+            users: [],
+            epis: [],
+            stock: [],
+            deliveries: [],
+            actions: [],
 
             // Inicializar
-            init() {
-                this.setupDefaultUsers();
+            async init() {
+                await this.setupDefaultUsers();
                 this.loadUserData();
                 this.setupEventListeners();
-                this.loadData();
-                this.setupDefaultData();
+                await this.loadData();
+                await this.setupDefaultData();
             },
 
             // Configurar usuários padrão
-            setupDefaultUsers() {
+            async setupDefaultUsers() {
+                this.users = await Storage.loadUsers();
                 if (this.users.length === 0) {
                     // Usuário administrador padrão
                     this.users = [
@@ -1386,12 +1503,13 @@
                             active: true
                         }
                     ];
-                    Storage.save('users', this.users);
+                    await Storage.saveUsers(this.users);
                 }
             },
 
             // Configurar dados padrão
-            setupDefaultData() {
+            async setupDefaultData() {
+                this.stock = await Storage.loadStock();
                 if (this.stock.length === 0) {
                     // Dados de exemplo para estoque
                     this.stock = [
@@ -1420,7 +1538,7 @@
                             createdAt: new Date().toISOString()
                         }
                     ];
-                    Storage.save('stock', this.stock);
+                    await Storage.saveStock(this.stock);
                 }
             },
 
@@ -1437,6 +1555,43 @@
                     this.showMainApp();
                 } else {
                     this.showLogin();
+                }
+            },
+
+            // Carregar todos os dados do Firebase
+            async loadData() {
+                try {
+                    this.showLoading(true);
+                    
+                    // Carregar todos os dados em paralelo
+                    const [users, epis, stock, deliveries, actions] = await Promise.all([
+                        Storage.loadUsers(),
+                        Storage.loadEpis(),
+                        Storage.loadStock(),
+                        Storage.loadDeliveries(),
+                        Storage.loadActions()
+                    ]);
+                    
+                    this.users = users;
+                    this.epis = epis;
+                    this.stock = stock;
+                    this.deliveries = deliveries;
+                    this.actions = actions;
+                    
+                    this.renderEPITable();
+                    this.renderStockTable();
+                    this.renderDeliveryTable();
+                    this.renderActionsList();
+                    this.renderUsersList();
+                    this.updateDashboard();
+                    this.updateReportsStats();
+                    this.updateAdminStats();
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    this.showToast('Erro ao carregar dados do servidor', 'error');
+                } finally {
+                    this.showLoading(false);
                 }
             },
 
@@ -1499,16 +1654,9 @@
                 document.getElementById('delivery-search-btn').addEventListener('click', () => this.searchDeliveries());
             },
 
-            // Carregar dados
-            loadData() {
-                this.renderEPITable();
-                this.renderStockTable();
-                this.renderDeliveryTable();
-                this.renderActionsList();
-                this.renderUsersList();
-                this.updateDashboard();
-                this.updateReportsStats();
-                this.updateAdminStats();
+            // MOSTRAR/OCULTAR LOADING
+            showLoading(show) {
+                document.getElementById('loading').style.display = show ? 'flex' : 'none';
             },
 
             // Login
@@ -1555,38 +1703,37 @@
 
             // Mostrar aplicação principal
             showMainApp() {
-               document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-container').style.display = 'block';
-    
-    const currentUserData = this.users.find(u => u.username === this.currentUser);
-    
-    // Atualizar interface do usuário
-    document.getElementById('current-user').textContent = currentUserData?.name || this.currentUser;
-    document.getElementById('current-setor').textContent = this.currentSetor;
-    document.getElementById('current-setor-display').textContent = this.currentSetor;
-    document.getElementById('user-avatar').textContent = (currentUserData?.name || this.currentUser).substring(0, 2).toUpperCase();
-    document.getElementById('user-role').textContent = this.currentUserRole === 'admin' ? 'Administrador' : 'Usuário';
-    
-    // Atualizar classe do setor
-    const setorElement = document.getElementById('current-setor');
-    setorElement.className = `setor-info setor-${this.currentSetor}`;
-    
-    // CORREÇÃO: Mostrar/ocultar aba de administração
-    const adminTab = document.getElementById('admin-tab');
-    if (this.currentUserRole === 'admin') {
-        adminTab.style.display = 'flex';
-    } else {
-        adminTab.style.display = 'none';
-        // Garantir que não estamos na aba de admin se o usuário não tem permissão
-        if (document.querySelector('[data-system="admin"]').classList.contains('active')) {
-            this.switchSystem('epi'); // Voltar para aba EPI se estava na admin
-        }
-    }
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                
+                const currentUserData = this.users.find(u => u.username === this.currentUser);
+                
+                // Atualizar interface do usuário
+                document.getElementById('current-user').textContent = currentUserData?.name || this.currentUser;
+                document.getElementById('current-setor').textContent = this.currentSetor;
+                document.getElementById('current-setor-display').textContent = this.currentSetor;
+                document.getElementById('user-avatar').textContent = (currentUserData?.name || this.currentUser).substring(0, 2).toUpperCase();
+                document.getElementById('user-role').textContent = this.currentUserRole === 'admin' ? 'Administrador' : 'Usuário';
+                
+                // Atualizar classe do setor
+                const setorElement = document.getElementById('current-setor');
+                setorElement.className = `setor-info setor-${this.currentSetor}`;
+                
+                // CORREÇÃO: Mostrar/ocultar aba de administração
+                const adminTab = document.getElementById('admin-tab');
+                if (this.currentUserRole === 'admin') {
+                    adminTab.style.display = 'flex';
+                } else {
+                    adminTab.style.display = 'none';
+                    // Garantir que não estamos na aba de admin se o usuário não tem permissão
+                    if (document.querySelector('[data-system="admin"]').classList.contains('active')) {
+                        this.switchSystem('epi'); // Voltar para aba EPI se estava na admin
+                    }
+                }
 
-    // Atualizar seletor de setor baseado no acesso do usuário
-    this.updateSetorSelector();
-},
-
+                // Atualizar seletor de setor baseado no acesso do usuário
+                this.updateSetorSelector();
+            },
 
             // Atualizar seletor de setor baseado no acesso do usuário
             updateSetorSelector() {
@@ -1611,27 +1758,27 @@
 
             // Trocar sistema
             switchSystem(system) {
-  // CORREÇÃO: Verificar permissão para acessar admin
-    if (system === 'admin' && this.currentUserRole !== 'admin') {
-        this.showToast('Acesso negado! Você não tem permissão para acessar a administração.', 'error');
-        return;
-    }
-    
-    document.querySelectorAll('.system-tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.system-content').forEach(content => {
-        content.classList.remove('active');
-    });
+                // CORREÇÃO: Verificar permissão para acessar admin
+                if (system === 'admin' && this.currentUserRole !== 'admin') {
+                    this.showToast('Acesso negado! Você não tem permissão para acessar a administração.', 'error');
+                    return;
+                }
+                
+                document.querySelectorAll('.system-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.system-content').forEach(content => {
+                    content.classList.remove('active');
+                });
 
-    document.querySelector(`[data-system="${system}"]`).classList.add('active');
-    document.getElementById(`${system}-system`).classList.add('active');
+                document.querySelector(`[data-system="${system}"]`).classList.add('active');
+                document.getElementById(`${system}-system`).classList.add('active');
 
-    if (system === 'admin') {
-        this.renderUsersList();
-        this.updateAdminStats();
-    }
-},
+                if (system === 'admin') {
+                    this.renderUsersList();
+                    this.updateAdminStats();
+                }
+            },
 
             // Trocar aba
             switchTab(tab) {
@@ -1813,7 +1960,7 @@
             },
 
             // Manipular EPI
-            handleEpiSubmit(e) {
+            async handleEpiSubmit(e) {
                 e.preventDefault();
                 
                 const formData = {
@@ -1838,7 +1985,7 @@
                     this.showToast('EPI adicionado com sucesso!');
                 }
                 
-                Storage.save('epis', this.epis);
+                await Storage.saveEpis(this.epis);
                 this.renderEPITable();
                 this.updateDashboard();
                 this.updateReportsStats();
@@ -1846,7 +1993,7 @@
             },
 
             // Manipular estoque
-            handleStockSubmit(e) {
+            async handleStockSubmit(e) {
                 e.preventDefault();
                 
                 const formData = {
@@ -1870,14 +2017,14 @@
                     this.showToast('Item adicionado ao estoque!');
                 }
                 
-                Storage.save('stock', this.stock);
+                await Storage.saveStock(this.stock);
                 this.renderStockTable();
                 this.updateDashboard();
                 this.closeModal('stock');
             },
 
             // Manipular entrega
-            handleDeliverySubmit(e) {
+            async handleDeliverySubmit(e) {
                 e.preventDefault();
                 
                 const stockItemId = document.getElementById('delivery-epi').value;
@@ -1913,8 +2060,10 @@
                 stockItem.quantity -= quantity;
                 stockItem.updatedAt = new Date().toISOString();
                 
-                Storage.save('deliveries', this.deliveries);
-                Storage.save('stock', this.stock);
+                await Promise.all([
+                    Storage.saveDeliveries(this.deliveries),
+                    Storage.saveStock(this.stock)
+                ]);
                 
                 this.renderDeliveryTable();
                 this.renderStockTable();
@@ -1924,7 +2073,7 @@
             },
 
             // Manipular ação
-            handleActionSubmit(e) {
+            async handleActionSubmit(e) {
                 e.preventDefault();
                 
                 const formData = {
@@ -1960,64 +2109,64 @@
                     this.showToast('Ação criada com sucesso!');
                 }
                 
-                Storage.save('actions', this.actions);
+                await Storage.saveActions(this.actions);
                 this.renderActionsList();
                 this.updateDashboard();
                 this.closeModal('action');
             },
 
             // Manipular usuário
-            handleUserSubmit(e) {
+            async handleUserSubmit(e) {
                 e.preventDefault();
                 
                 const password = document.getElementById('user-password').value;
-    const confirmPassword = document.getElementById('user-confirm-password').value;
-    
-    if (password !== confirmPassword) {
-        this.showToast('As senhas não coincidem!', 'error');
-        return;
-    }
-    
-    const formData = {
-        name: document.getElementById('user-name').value,
-        username: document.getElementById('user-username').value,
-        password: password,
-        role: document.getElementById('user-role').value,
-        setor: document.getElementById('user-setor').value,
-        active: true,
-        updatedAt: new Date().toISOString()
-    };
-    
-    // CORREÇÃO: Verificar se username já existe (apenas usuários ativos)
-    const existingUser = this.users.find(u => 
-        u.username === formData.username && 
-        u.id !== this.editingId && 
-        u.active !== false
-    );
-    
-    if (existingUser) {
-        this.showToast('Nome de usuário já existe!', 'error');
-        return;
-    }
-    
-    if (this.editingId) {
-        // Atualizar usuário
-        const index = this.users.findIndex(u => u.id === this.editingId);
-        this.users[index] = { ...this.users[index], ...formData };
-        this.showToast('Usuário atualizado com sucesso!');
-    } else {
-        // Criar novo usuário
-        formData.id = Storage.generateId();
-        formData.createdAt = new Date().toISOString();
-        this.users.push(formData);
-        this.showToast('Usuário criado com sucesso!');
-    }
-    
-    Storage.save('users', this.users);
-    this.renderUsersList();
-    this.updateAdminStats();
-    this.closeModal('user');
-},
+                const confirmPassword = document.getElementById('user-confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    this.showToast('As senhas não coincidem!', 'error');
+                    return;
+                }
+                
+                const formData = {
+                    name: document.getElementById('user-name').value,
+                    username: document.getElementById('user-username').value,
+                    password: password,
+                    role: document.getElementById('user-role').value,
+                    setor: document.getElementById('user-setor').value,
+                    active: true,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // CORREÇÃO: Verificar se username já existe (apenas usuários ativos)
+                const existingUser = this.users.find(u => 
+                    u.username === formData.username && 
+                    u.id !== this.editingId && 
+                    u.active !== false
+                );
+                
+                if (existingUser) {
+                    this.showToast('Nome de usuário já existe!', 'error');
+                    return;
+                }
+                
+                if (this.editingId) {
+                    // Atualizar usuário
+                    const index = this.users.findIndex(u => u.id === this.editingId);
+                    this.users[index] = { ...this.users[index], ...formData };
+                    this.showToast('Usuário atualizado com sucesso!');
+                } else {
+                    // Criar novo usuário
+                    formData.id = Storage.generateId();
+                    formData.createdAt = new Date().toISOString();
+                    this.users.push(formData);
+                    this.showToast('Usuário criado com sucesso!');
+                }
+                
+                await Storage.saveUsers(this.users);
+                this.renderUsersList();
+                this.updateAdminStats();
+                this.closeModal('user');
+            },
 
             // Renderizar tabela de EPI
             renderEPITable() {
@@ -2283,10 +2432,10 @@
             },
 
             // Deletar EPI
-            deleteEPI(id) {
+            async deleteEPI(id) {
                 if (confirm('Tem certeza que deseja excluir este EPI?')) {
                     this.epis = this.epis.filter(epi => epi.id !== id);
-                    Storage.save('epis', this.epis);
+                    await Storage.saveEpis(this.epis);
                     this.renderEPITable();
                     this.updateDashboard();
                     this.updateReportsStats();
@@ -2295,10 +2444,10 @@
             },
 
             // Deletar estoque
-            deleteStock(id) {
+            async deleteStock(id) {
                 if (confirm('Tem certeza que deseja excluir este item do estoque?')) {
                     this.stock = this.stock.filter(stock => stock.id !== id);
-                    Storage.save('stock', this.stock);
+                    await Storage.saveStock(this.stock);
                     this.renderStockTable();
                     this.updateDashboard();
                     this.showToast('Item excluído do estoque!');
@@ -2306,7 +2455,7 @@
             },
 
             // Deletar entrega
-            deleteDelivery(id) {
+            async deleteDelivery(id) {
                 if (confirm('Tem certeza que deseja excluir esta entrega?')) {
                     const delivery = this.deliveries.find(d => d.id === id);
                     if (delivery) {
@@ -2314,12 +2463,12 @@
                         const stockItem = this.stock.find(item => item.id === delivery.stockItemId);
                         if (stockItem) {
                             stockItem.quantity += delivery.quantity;
-                            Storage.save('stock', this.stock);
+                            await Storage.saveStock(this.stock);
                         }
                     }
                     
                     this.deliveries = this.deliveries.filter(delivery => delivery.id !== id);
-                    Storage.save('deliveries', this.deliveries);
+                    await Storage.saveDeliveries(this.deliveries);
                     this.renderDeliveryTable();
                     this.renderStockTable();
                     this.showToast('Entrega excluída!');
@@ -2327,10 +2476,10 @@
             },
 
             // Deletar ação
-            deleteAction(id) {
+            async deleteAction(id) {
                 if (confirm('Tem certeza que deseja excluir esta ação?')) {
                     this.actions = this.actions.filter(action => action.id !== id);
-                    Storage.save('actions', this.actions);
+                    await Storage.saveActions(this.actions);
                     this.renderActionsList();
                     this.updateDashboard();
                     this.showToast('Ação excluída!');
@@ -2338,33 +2487,33 @@
             },
 
             // Deletar usuário
-            deleteUser(id) {
+            async deleteUser(id) {
                 const user = this.users.find(u => u.id === id);
-    if (user && user.username === 'admin') {
-        this.showToast('Não é possível excluir o usuário administrador principal!', 'error');
-        return;
-    }
-    
-    if (confirm('Tem certeza que deseja excluir este usuário?')) {
-        // Marcar como inativo em vez de excluir completamente
-        const index = this.users.findIndex(u => u.id === id);
-        this.users[index].active = false;  // ← Isso deve estar como false
-        this.users[index].updatedAt = new Date().toISOString();
-        
-        Storage.save('users', this.users);
-        this.renderUsersList();
-        this.updateAdminStats();
-        this.showToast('Usuário excluído com sucesso!');
-    }
-},
+                if (user && user.username === 'admin') {
+                    this.showToast('Não é possível excluir o usuário administrador principal!', 'error');
+                    return;
+                }
+                
+                if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                    // Marcar como inativo em vez de excluir completamente
+                    const index = this.users.findIndex(u => u.id === id);
+                    this.users[index].active = false;
+                    this.users[index].updatedAt = new Date().toISOString();
+                    
+                    await Storage.saveUsers(this.users);
+                    this.renderUsersList();
+                    this.updateAdminStats();
+                    this.showToast('Usuário excluído com sucesso!');
+                }
+            },
 
             // Atualizar status da ação
-            updateActionStatus(id, status) {
+            async updateActionStatus(id, status) {
                 const action = this.actions.find(a => a.id === id);
                 if (action) {
                     action.status = status;
                     action.updatedAt = new Date().toISOString();
-                    Storage.save('actions', this.actions);
+                    await Storage.saveActions(this.actions);
                     this.renderActionsList();
                     this.updateDashboard();
                     this.showToast('Status da ação atualizado!');

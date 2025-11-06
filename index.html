@@ -1545,19 +1545,18 @@
             // Carregar dados do usuário
             loadUserData() {
                 const savedUser = localStorage.getItem('currentUser');
-    const savedSetor = localStorage.getItem('currentSetor');
-    const savedRole = localStorage.getItem('currentUserRole');
-    
-    if (savedUser && savedSetor && savedRole) {
-        this.currentUser = savedUser;
-        this.currentSetor = savedSetor;
-        // CORREÇÃO: Carregar role do localStorage
-        this.currentUserRole = savedRole;
-        this.showMainApp();
-    } else {
-        this.showLogin();
-    }
-},
+                const savedSetor = localStorage.getItem('currentSetor');
+                const savedRole = localStorage.getItem('currentUserRole');
+                
+                if (savedUser && savedSetor && savedRole) {
+                    this.currentUser = savedUser;
+                    this.currentSetor = savedSetor;
+                    this.currentUserRole = savedRole;
+                    this.showMainApp();
+                } else {
+                    this.showLogin();
+                }
+            },
 
             // Carregar todos os dados do Firebase
             async loadData() {
@@ -1660,36 +1659,36 @@
                 document.getElementById('loading').style.display = show ? 'flex' : 'none';
             },
 
-            // Login
+            // Login - CORRIGIDO
             handleLogin() {
                 const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    const setor = document.getElementById('login-setor').value;
+                const password = document.getElementById('login-password').value;
+                const setor = document.getElementById('login-setor').value;
 
-    const user = this.users.find(u => u.username === username && u.active !== false);
-    
-    if (user && user.password === password) {
-        // Verificar acesso ao setor
-        if (user.setor !== 'ambos' && user.setor !== setor) {
-            this.showToast('Usuário não tem acesso a este setor!', 'error');
-            return;
-        }
+                const user = this.users.find(u => u.username === username && u.active !== false);
+                
+                if (user && user.password === password) {
+                    // Verificar acesso ao setor
+                    if (user.setor !== 'ambos' && user.setor !== setor) {
+                        this.showToast('Usuário não tem acesso a este setor!', 'error');
+                        return;
+                    }
 
-        this.currentUser = user.username;
-        this.currentSetor = setor;
-        // CORREÇÃO: Carregar o role do usuário do banco de dados
-        this.currentUserRole = user.role;
-        
-        localStorage.setItem('currentUser', user.username);
-        localStorage.setItem('currentSetor', setor);
-        localStorage.setItem('currentUserRole', user.role);
-        
-        this.showMainApp();
-        this.showToast(`Bem-vindo, ${user.name}!`);
-    } else {
-        this.showToast('Usuário ou senha incorretos!', 'error');
-    }
-},
+                    this.currentUser = user.username;
+                    this.currentSetor = setor;
+                    // CORREÇÃO: Carregar role do usuário do banco de dados
+                    this.currentUserRole = user.role;
+                    
+                    localStorage.setItem('currentUser', user.username);
+                    localStorage.setItem('currentSetor', setor);
+                    localStorage.setItem('currentUserRole', user.role);
+                    
+                    this.showMainApp();
+                    this.showToast(`Bem-vindo, ${user.name}!`);
+                } else {
+                    this.showToast('Usuário ou senha incorretos!', 'error');
+                }
+            },
 
             // Logout
             handleLogout() {
@@ -1703,45 +1702,45 @@
                 this.showToast('Logout realizado!');
             },
 
-            // Mostrar aplicação principal
+            // Mostrar aplicação principal - CORRIGIDO
             showMainApp() {
                 document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-container').style.display = 'block';
-    
-    const currentUserData = this.users.find(u => u.username === this.currentUser);
-    
-    // Atualizar interface do usuário
-    document.getElementById('current-user').textContent = currentUserData?.name || this.currentUser;
-    document.getElementById('current-setor').textContent = this.currentSetor;
-    document.getElementById('current-setor-display').textContent = this.currentSetor;
-    document.getElementById('user-avatar').textContent = (currentUserData?.name || this.currentUser).substring(0, 2).toUpperCase();
-    
-    // CORREÇÃO CRÍTICA: Atualizar role baseado no usuário atual do banco de dados
-    this.currentUserRole = currentUserData?.role || 'user';
-    document.getElementById('user-role').textContent = this.currentUserRole === 'admin' ? 'Administrador' : 'Usuário';
-    
-    // Atualizar classe do setor
-    const setorElement = document.getElementById('current-setor');
-    setorElement.className = `setor-info setor-${this.currentSetor}`;
-    
-    // CORREÇÃO: Mostrar/ocultar aba de administração baseado no role REAL do usuário
-    const adminTab = document.getElementById('admin-tab');
-    if (this.currentUserRole === 'admin') {
-        adminTab.style.display = 'flex';
-    } else {
-        adminTab.style.display = 'none';
-        // Garantir que não estamos na aba de admin se o usuário não tem permissão
-        if (document.querySelector('[data-system="admin"]').classList.contains('active')) {
-            this.switchSystem('epi'); // Voltar para aba EPI se estava na admin
-        }
-    }
+                document.getElementById('main-container').style.display = 'block';
+                
+                const currentUserData = this.users.find(u => u.username === this.currentUser);
+                
+                // Atualizar interface do usuário
+                document.getElementById('current-user').textContent = currentUserData?.name || this.currentUser;
+                document.getElementById('current-setor').textContent = this.currentSetor;
+                document.getElementById('current-setor-display').textContent = this.currentSetor;
+                document.getElementById('user-avatar').textContent = (currentUserData?.name || this.currentUser).substring(0, 2).toUpperCase();
+                
+                // CORREÇÃO CRÍTICA: Atualizar role baseado no usuário atual do banco de dados
+                this.currentUserRole = currentUserData?.role || 'user';
+                document.getElementById('user-role').textContent = this.currentUserRole === 'admin' ? 'Administrador' : 'Usuário';
+                
+                // Atualizar classe do setor
+                const setorElement = document.getElementById('current-setor');
+                setorElement.className = `setor-info setor-${this.currentSetor}`;
+                
+                // CORREÇÃO: Mostrar/ocultar aba de administração baseado no role REAL do usuário
+                const adminTab = document.getElementById('admin-tab');
+                if (this.currentUserRole === 'admin') {
+                    adminTab.style.display = 'flex';
+                } else {
+                    adminTab.style.display = 'none';
+                    // Garantir que não estamos na aba de admin se o usuário não tem permissão
+                    if (document.querySelector('[data-system="admin"]').classList.contains('active')) {
+                        this.switchSystem('epi'); // Voltar para aba EPI se estava na admin
+                    }
+                }
 
-    // Atualizar seletor de setor baseado no acesso do usuário
-    this.updateSetorSelector();
-    
-    // Atualizar localStorage com o role correto
-    localStorage.setItem('currentUserRole', this.currentUserRole);
-},
+                // Atualizar seletor de setor baseado no acesso do usuário
+                this.updateSetorSelector();
+                
+                // Atualizar localStorage com o role correto
+                localStorage.setItem('currentUserRole', this.currentUserRole);
+            },
 
             // Atualizar seletor de setor baseado no acesso do usuário
             updateSetorSelector() {
@@ -2123,7 +2122,7 @@
                 this.closeModal('action');
             },
 
-            // Manipular usuário
+            // Manipular usuário - CORRIGIDO
             async handleUserSubmit(e) {
                 e.preventDefault();
                 

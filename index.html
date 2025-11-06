@@ -3,41 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Unificado JSL - EPI e 5W2H</title>
+    <title>Sistema Unificado JSL - Gestão Completa</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <!-- Adicione o SDK do Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS do Sistema de Gestão de EPI (mantido igual) */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
             --accent-color: #e74c3c;
             --success-color: #27ae60;
             --warning-color: #f39c12;
-            --light-gray: #f5f5f5;
-            --border-color: #ddd;
-            --table-header: #2c3e50;
-            --low-risk: #d4edda;
-            --medium-risk: #fff3cd;
-            --high-risk: #f8d7da;
+            --info-color: #17a2b8;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --border-color: #dee2e6;
+            --motorizada-color: #3498db;
+            --canteiro-color: #e74c3c;
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: #f9f9f9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             line-height: 1.6;
+            min-height: 100vh;
             padding: 20px;
+        }
+        
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+        }
+        
+        .login-card {
+            width: 420px;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        
+        .login-card h2 {
+            color: #2c3e50;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        
+        .input, .select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
         }
         
         .container {
@@ -45,196 +123,211 @@
             margin: 0 auto;
             background: white;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
         }
         
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            font-size: 28px;
-            padding: 15px;
-            background: linear-gradient(135deg, #1a3a5f 0%, #2c3e50 100%);
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .logo h1 {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            border-radius: 5px;
             font-weight: bold;
+        }
+
+        .setor-info {
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .setor-motorizada {
+            background: linear-gradient(135deg, var(--motorizada-color), #2980b9);
+        }
+
+        .setor-canteiro {
+            background: linear-gradient(135deg, var(--canteiro-color), #c0392b);
         }
         
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
         }
         
         .dashboard-card {
             background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 4px solid var(--secondary-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--secondary-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card.motorizada {
+            border-left-color: var(--motorizada-color);
+        }
+
+        .dashboard-card.canteiro {
+            border-left-color: var(--canteiro-color);
         }
         
-        .dashboard-card.warning {
-            border-top-color: var(--warning-color);
-        }
-        
-        .dashboard-card.danger {
-            border-top-color: var(--accent-color);
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
         
         .dashboard-card h3 {
-            font-size: 14px;
-            color: #7f8c8d;
+            font-size: 0.95rem;
+            color: var(--dark-gray);
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .dashboard-card .value {
-            font-size: 28px;
+            font-size: 2.5rem;
             font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .card-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0.2;
             color: var(--primary-color);
         }
         
-        .dashboard-card .subtext {
-            font-size: 12px;
-            color: #95a5a6;
-            margin-top: 5px;
+        .system-navigation {
+            display: flex;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .system-tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            background: var(--light-gray);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            color: var(--dark-gray);
+        }
+        
+        .system-tab.active {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .system-content {
+            display: none;
+        }
+        
+        .system-content.active {
+            display: block;
         }
         
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
             flex-wrap: wrap;
+            gap: 5px;
         }
         
         .tab {
-            padding: 12px 24px;
+            padding: 15px 25px;
             cursor: pointer;
-            background: #f8f9fa;
-            border: 1px solid var(--border-color);
+            background: var(--light-gray);
+            border: 2px solid var(--border-color);
             border-bottom: none;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
+            border-radius: 8px 8px 0 0;
             font-weight: 500;
             transition: all 0.3s;
+            color: var(--dark-gray);
         }
         
         .tab.active {
             background: white;
-            border-bottom: 1px solid white;
-            margin-bottom: -1px;
-            font-weight: bold;
+            border-color: var(--secondary-color);
             color: var(--secondary-color);
-        }
-        
-        .tab:hover {
-            background: #e9ecef;
+            font-weight: 600;
         }
         
         .tab-content {
             display: none;
-            padding: 20px 0;
+            padding: 25px 0;
         }
         
         .tab-content.active {
             display: block;
         }
         
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-right: 10px;
-            transition: all 0.3s;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(to right, #3498db, #2980b9);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(to right, #2980b9, #1c6ea4);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        
-        .btn-success {
-            background: linear-gradient(to right, #27ae60, #219653);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: linear-gradient(to right, #219653, #1e7e34);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(to right, #e74c3c, #c0392b);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(to right, #c0392b, #a93226);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(to right, #f39c12, #e67e22);
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background: linear-gradient(to right, #e67e22, #d35400);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        
-        .btn-sm {
-            padding: 8px 15px;
-            font-size: 12px;
-        }
-        
-        .btn-info {
-            background: linear-gradient(to right, #17a2b8, #138496);
-            color: white;
-        }
-        
-        .btn-info:hover {
-            background: linear-gradient(to right, #138496, #117a8b);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        
         .actions {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            padding: 20px;
+            background: var(--light-gray);
+            border-radius: 10px;
         }
         
         .search-box {
             display: flex;
-            margin-bottom: 20px;
+            flex: 1;
+            max-width: 400px;
         }
         
         .search-box input {
             flex: 1;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px 0 0 4px;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px 0 0 8px;
             font-size: 14px;
         }
         
@@ -243,16 +336,17 @@
             background: var(--secondary-color);
             color: white;
             border: none;
-            border-radius: 0 4px 4px 0;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
         }
         
         .table-container {
             overflow-x: auto;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             border: 1px solid var(--border-color);
-            border-radius: 5px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white;
         }
         
         table {
@@ -268,9 +362,9 @@
         }
         
         th {
-            background: linear-gradient(to bottom, #3a5795, #2c3e50);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             position: sticky;
             top: 0;
         }
@@ -279,35 +373,58 @@
             background-color: var(--light-gray);
         }
         
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+
+        .badge-setor {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-motorizada {
+            background: var(--motorizada-color);
+            color: white;
+        }
+
+        .badge-canteiro {
+            background: var(--canteiro-color);
+            color: white;
+        }
+        
         .status-badge {
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
+            display: inline-block;
         }
         
         .status-valid {
-            background-color: var(--low-risk);
+            background-color: #d4edda;
             color: #155724;
         }
         
         .status-warning {
-            background-color: var(--medium-risk);
+            background-color: #fff3cd;
             color: #856404;
         }
         
         .status-expired {
-            background-color: var(--high-risk);
+            background-color: #f8d7da;
             color: #721c24;
         }
         
         .status-low-stock {
-            background-color: var(--high-risk);
+            background-color: #f8d7da;
             color: #721c24;
         }
         
         .status-ok {
-            background-color: var(--low-risk);
+            background-color: #d4edda;
             color: #155724;
         }
         
@@ -322,51 +439,64 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         
         .modal-content {
             background-color: white;
             padding: 30px;
-            border-radius: 8px;
+            border-radius: 15px;
             width: 90%;
-            max-width: 850px;
+            max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-gray);
         }
         
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            font-size: 15px;
+            font-weight: 600;
             color: var(--primary-color);
         }
         
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 15px;
-            transition: border-color 0.3s;
-            font-family: 'Calibri', 'Segoe UI', sans-serif;
-        }
-        
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            border-color: var(--secondary-color);
-            outline: none;
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
         }
         
         .form-row {
             display: flex;
-            gap: 18px;
-            margin-bottom: 18px;
+            gap: 20px;
         }
         
         .form-row .form-group {
@@ -376,135 +506,61 @@
         .form-actions {
             display: flex;
             justify-content: flex-end;
-            margin-top: 20px;
+            margin-top: 25px;
             gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
         }
         
-        .required::after {
-            content: " *";
-            color: #e74c3c;
-        }
-        
-        @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .tab {
-                margin-right: 0;
-                margin-bottom: 5px;
-                border-radius: 5px;
-            }
-            
-            .tab.active {
-                border-bottom: 1px solid var(--border-color);
-                margin-bottom: 5px;
-            }
-            
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                margin-right: 0;
-                margin-bottom: 10px;
-                width: 100%;
-            }
-        }
-        
-        .logo {
-            text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .logo h1 {
-            background: linear-gradient(135deg, #1a3a5f 0%, #2c3e50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-            font-size: 36px;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-        
-        .logo p {
-            color: #7f8c8d;
-            font-size: 16px;
-            font-style: italic;
-        }
-        
-        .instructions {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .instructions h4 {
-            margin-bottom: 8px;
-            color: #856404;
+        .setor-selector {
             display: flex;
-            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
-        .instructions h4::before {
-            content: "💡";
-            margin-right: 8px;
+        .setor-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
         }
         
-        .save-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--success-color);
+        .setor-btn.active {
+            background: var(--secondary-color);
             color: white;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            display: none;
-            z-index: 1001;
+            border-color: var(--secondary-color);
         }
 
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 1002;
+        .setor-btn.motorizada.active {
+            background: var(--motorizada-color);
+            border-color: var(--motorizada-color);
         }
 
-        .connection-online {
-            background-color: var(--success-color);
+        .setor-btn.canteiro.active {
+            background: var(--canteiro-color);
+            border-color: var(--canteiro-color);
+        }
+        
+        .logout-btn {
+            background: #ef4444;
             color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
         }
-
-        .connection-offline {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        /* Loading overlay */
+        
         .loading {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: flex;
+            background: rgba(0,0,0,0.8);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -514,13 +570,13 @@
         }
 
         .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin-bottom: 15px;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
@@ -528,354 +584,15 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Navegação entre sistemas */
-        .system-navigation {
-            display: flex;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .system-tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            background: #f8f9fa;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            font-size: 16px;
-        }
-
-        .system-tab:hover {
-            background: #e9ecef;
-        }
-
-        .system-tab.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .system-tab.epi.active {
-            background: #3498db;
-        }
-
-        .system-tab.w2h.active {
-            background: #8e44ad;
-        }
-
-        .system-content {
-            display: none;
-        }
-
-        .system-content.active {
-            display: block;
-        }
-
-        /* CSS do Plano de Ação 5W2H (atualizado) */
-        .w2h-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .w2h-actions-left {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .w2h-actions-right {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            border-top: 3px solid #4f8af7;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #6b7280;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .filters {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .filter-label {
-            font-weight: 500;
-            color: #374151;
-            font-size: 0.9rem;
-        }
-
-        .input, .select {
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: white;
-            transition: border-color 0.2s;
-        }
-
-        .input:focus, .select:focus {
-            outline: none;
-            border-color: #4f8af7;
-        }
-
-        .actions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .action-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #4f8af7;
-            transition: box-shadow 0.2s;
-        }
-
-        .action-item:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        .action-item.alta { border-left-color: #ef4444; }
-        .action-item.media { border-left-color: #f59e0b; }
-        .action-item.baixa { border-left-color: #10b981; }
-        .action-item.realizado { 
-            border-left-color: #10b981;
-            background-color: #f0fff4; /* Verde bem clarinho quando concluído */
-        }
-
-        .action-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-            gap: 1rem;
-        }
-
-        .action-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #374151;
-            flex: 1;
-        }
-
-        .action-meta {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge-priority { background: #e8f0fe; color: #4f8af7; }
-        .badge-status { background: #f1f5f9; color: #6b7280; }
-        .badge-success { background: #d1fae5; color: #10b981; }
-        .badge-warning { background: #fef3c7; color: #f59e0b; }
-        .badge-danger { background: #fee2e2; color: #ef4444; }
-
-        .action-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .detail {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .detail-label {
-            font-size: 0.8rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            color: #374151;
-            font-size: 0.9rem;
-        }
-
-        .action-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 1rem;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .action-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.5rem;
-            font-size: 0.8rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #4f8af7;
-            opacity: 0.5;
-        }
-
-        /* Modal 5W2H */
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-close:hover {
-            color: #374151;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #4f8af7;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn-outline {
-            background: white;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-outline:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
-
-        /* Toast */
         .toast {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10b981;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success-color);
             color: white;
-            padding: 1rem 1.5rem;
+            padding: 15px 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
@@ -888,12 +605,169 @@
         }
 
         .toast.error {
-            background: #ef4444;
+            background: var(--accent-color);
+        }
+
+        .action-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--secondary-color);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .action-item.concluido {
+            border-left-color: var(--success-color);
+            background: #f0fff4;
+        }
+
+        .action-item.atrasado {
+            border-left-color: var(--accent-color);
+            background: #fff5f5;
+        }
+
+        .action-item.andamento {
+            border-left-color: var(--warning-color);
+            background: #fffef0;
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .action-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            flex: 1;
+        }
+
+        .action-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .detail-value {
+            color: var(--primary-color);
+            font-size: 0.95rem;
+        }
+
+        .action-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .admin-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .admin-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--medium-gray);
+            padding-bottom: 10px;
+        }
+
+        .user-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .user-info-small {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-details {
+            font-size: 0.85rem;
+            color: var(--dark-gray);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
         }
 
         @media (max-width: 768px) {
-            .filters-grid {
+            .container {
+                padding: 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .dashboard {
                 grid-template-columns: 1fr;
+            }
+            
+            .system-navigation {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-radius: 8px;
+                margin-bottom: 5px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
             }
             
             .action-header {
@@ -902,967 +776,1960 @@
             
             .action-meta {
                 width: 100%;
+                margin-top: 10px;
             }
-            
-            .action-details {
-                grid-template-columns: 1fr;
-            }
-            
-            .action-footer {
+
+            .user-item {
                 flex-direction: column;
-                gap: 1rem;
+                align-items: flex-start;
+                gap: 15px;
             }
-            
-            .action-actions {
+
+            .user-actions {
                 width: 100%;
-                justify-content: center;
-            }
-
-            .w2h-actions {
-                flex-direction: column;
-            }
-
-            .w2h-actions-left, .w2h-actions-right {
-                width: 100%;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
+                justify-content: flex-end;
             }
         }
     </style>
 </head>
 <body>
-    <div class="connection-status" id="connection-status">Conectando...</div>
-    <div class="save-indicator" id="save-indicator">Dados salvos com sucesso!</div>
-    <div class="loading" id="loading" style="display: none;">
-        <div class="loading-spinner"></div>
-        <div>Processando...</div>
+    <!-- Tela de Login -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <h2>Sistema Unificado JSL</h2>
+            <p style="text-align: center; color: var(--dark-gray); margin-bottom: 20px;">Gestão Completa de EPI e 5W2H</p>
+            <input type="text" id="login-username" class="input" placeholder="Usuário" value="admin">
+            <input type="password" id="login-password" class="input" placeholder="Senha" value="admin123">
+            <select id="login-setor" class="select">
+                <option value="motorizada">Motorizada</option>
+                <option value="canteiro">Canteiro</option>
+            </select>
+            <button class="btn btn-primary" id="login-btn">Entrar</button>
+            <p style="text-align: center; margin-top: 15px; color: var(--dark-gray); font-size: 0.9rem;">
+                Solicite seu login
+            </p>
+        </div>
     </div>
-    
-    <div class="container">
-        <div class="logo">
-            <h1>Sistema Unificado JSL</h1>
-            <p>Gestão de EPI e Plano de Ação 5W2H</p>
-        </div>
-        
-        <!-- Navegação entre sistemas -->
-        <div class="system-navigation">
-            <button class="system-tab epi active" data-system="epi">Sistema de Gestão de EPI</button>
-            <button class="system-tab w2h" data-system="w2h">Plano de Ação 5W2H</button>
-        </div>
 
-        <!-- Sistema de Gestão de EPI -->
-        <div class="system-content active" id="epi-system">
-            <div class="instructions">
-                <h4>Instruções de Uso - Gestão de EPI</h4>
-                <p>Utilize as abas para navegar entre os diferentes módulos do sistema. Preencha todos os campos obrigatórios marcados com asterisco (*). <strong>Todos os dados são salvos automaticamente no Firebase!</strong></p>
-            </div>
-            
-            <div class="dashboard">
-                <div class="dashboard-card">
-                    <h3>Total de EPIs Cadastrados</h3>
-                    <div class="value" id="total-epis">0</div>
-                    <div class="subtext">Itens no sistema</div>
-                </div>
-                <div class="dashboard-card">
-                    <h3>EPIs Vencidos</h3>
-                    <div class="value" id="epis-vencidos">0</div>
-                    <div class="subtext">Necessitam substituição</div>
-                </div>
-                <div class="dashboard-card warning">
-                    <h3>EPIs Próximos do Vencimento</h3>
-                    <div class="value" id="epis-proximo-vencimento">0</div>
-                    <div class="subtext">Vencem em menos de 30 dias</div>
-                </div>
-                <div class="dashboard-card danger">
-                    <h3>Estoques Baixos</h3>
-                    <div class="value" id="estoques-baixos">0</div>
-                    <div class="subtext">Necessitam reposição</div>
-                </div>
-            </div>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="epis">Controle de EPIs</div>
-                <div class="tab" data-tab="estoque">Controle de Estoque</div>
-                <div class="tab" data-tab="entregas">Controle de Entregas</div>
-                <div class="tab" data-tab="relatorios">Relatórios</div>
-            </div>
-            
-            <!-- ABA: Controle de EPIs -->
-            <div class="tab-content active" id="epis-tab">
-                <div class="actions">
-                    <button class="btn btn-primary" id="btn-adicionar-epi">
-                        ➕ Adicionar EPI
-                    </button>
-                    <div class="search-box">
-                        <input type="text" id="search-epi" placeholder="Buscar EPI...">
-                        <button onclick="filtrarEPIs()">🔍 Buscar</button>
-                    </div>
-                </div>
-                
-                <div class="table-container">
-                    <table id="tabela-epis">
-                        <thead>
-                            <tr>
-                                <th>NOME DO EPI</th>
-                                <th>FABRICANTE</th>
-                                <th>C.A</th>
-                                <th>VALIDADE DO C.A</th>
-                                <th>VALIDADE DO EPI</th>
-                                <th>STATUS</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Os dados serão inseridos aqui via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- ABA: Controle de Estoque -->
-            <div class="tab-content" id="estoque-tab">
-                <div class="actions">
-                    <button class="btn btn-primary" id="btn-adicionar-estoque">
-                        ➕ Adicionar ao Estoque
-                    </button>
-                    <button class="btn btn-info" id="btn-entrada-estoque">
-                        📥 Nova Entrada
-                    </button>
-                    <div class="search-box">
-                        <input type="text" id="search-estoque" placeholder="Buscar no estoque...">
-                        <button onclick="filtrarEstoque()">🔍 Buscar</button>
-                    </div>
-                </div>
-                
-                <div class="table-container">
-                    <table id="tabela-estoque">
-                        <thead>
-                            <tr>
-                                <th>NOME DO EPI</th>
-                                <th>SAÍDAS</th>
-                                <th>ENTRADAS</th>
-                                <th>ESTOQUE ATUAL</th>
-                                <th>QNTD. MÍNIMA</th>
-                                <th>STATUS</th>
-                                <th>VALOR UNITÁRIO</th>
-                                <th>GASTO TOTAL</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Os dados serão inseridos aqui via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- ABA: Controle de Entregas -->
-            <div class="tab-content" id="entregas-tab">
-                <div class="actions">
-                    <button class="btn btn-primary" id="btn-nova-entrega">
-                        ➕ Nova Entrega
-                    </button>
-                    <div class="search-box">
-                        <input type="text" id="search-entregas" placeholder="Buscar entregas...">
-                        <button onclick="filtrarEntregas()">🔍 Buscar</button>
-                    </div>
-                </div>
-                
-                <div class="table-container">
-                    <table id="tabela-entregas">
-                        <thead>
-                            <tr>
-                                <th>DATA</th>
-                                <th>NOME DO FUNCIONÁRIO</th>
-                                <th>CARGO</th>
-                                <th>SETOR</th>
-                                <th>EPI</th>
-                                <th>QNTD.</th>
-                                <th>VALOR UNITÁRIO</th>
-                                <th>VALOR TOTAL</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Os dados serão inseridos aqui via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- ABA: Relatórios -->
-            <div class="tab-content" id="relatorios-tab">
-                <div class="actions">
-                    <button class="btn btn-primary" id="btn-relatorio-epis">
-                        📄 Relatório de EPIs
-                    </button>
-                    <button class="btn btn-success" id="btn-relatorio-estoque">
-                        📄 Relatório de Estoque
-                    </button>
-                    <button class="btn btn-warning" id="btn-relatorio-entregas">
-                        📄 Relatório de Entregas
-                    </button>
-                    <button class="btn btn-danger" id="btn-backup">
-                        💾 Backup Completo
-                    </button>
-                </div>
-                
-                <div class="dashboard" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-                    <div class="dashboard-card">
-                        <h3>EPIs por Status</h3>
-                        <div id="chart-status" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="statusChart" width="200" height="200"></canvas>
-                        </div>
-                    </div>
-                    <div class="dashboard-card">
-                        <h3>Top 5 EPIs Mais Utilizados</h3>
-                        <div id="chart-top-epis" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="topEpisChart" width="200" height="200"></canvas>
-                        </div>
-                    </div>
-                    <div class="dashboard-card">
-                        <h3>Gastos por Categoria</h3>
-                        <div id="chart-gastos" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                            <canvas id="gastosChart" width="200" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sistema Plano de Ação 5W2H -->
-        <div class="system-content" id="w2h-system">
-            <div class="instructions">
-                <h4>Instruções de Uso - Plano de Ação 5W2H</h4>
-                <p>Utilize os filtros para encontrar ações específicas. Preencha todos os campos obrigatórios marcados com asterisco (*). <strong>Todos os dados são salvos automaticamente no Firebase!</strong></p>
-            </div>
-
-            <!-- Botões de Ação 5W2H -->
-            <div class="w2h-actions">
-                <div class="w2h-actions-left">
-                    <button class="btn btn-success" id="btn-new-action">
-                        <i class="fas fa-plus"></i> Novo Plano de Ação
-                    </button>
-                    <button class="btn btn-primary" id="btn-generate-pdf">
-                        <i class="fas fa-file-pdf"></i> Gerar PDF
-                    </button>
-                </div>
-                <div class="w2h-actions-right">
-                    <button class="btn btn-info" id="btn-refresh">
-                        <i class="fas fa-sync-alt"></i> Atualizar
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="total-actions">0</div>
-                    <div class="stat-label">Total de Ações</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="in-progress">0</div>
-                    <div class="stat-label">Em Andamento</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="completed">0</div>
-                    <div class="stat-label">Concluídas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="overdue">0</div>
-                    <div class="stat-label">Atrasadas</div>
-                </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="filters">
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label class="filter-label">Prioridade</label>
-                        <select class="select" id="filter-priority">
-                            <option value="all">Todas</option>
-                            <option value="Alta">Alta</option>
-                            <option value="Média">Média</option>
-                            <option value="Baixa">Baixa</option>
-                            <option value="Realizado">Realizado</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Responsável</label>
-                        <select class="select" id="filter-responsible">
-                            <option value="all">Todos</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Setor</label>
-                        <select class="select" id="filter-area">
-                            <option value="all">Todos</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Status</label>
-                        <select class="select" id="filter-status">
-                            <option value="all">Todos</option>
-                            <option value="Em Execução">Em Execução</option>
-                            <option value="Realizado">Realizado</option>
-                            <option value="Pendente">Pendente</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div style="display: flex; gap: 1rem; align-items: end;">
-                    <div class="filter-group" style="flex: 1;">
-                        <label class="filter-label">Buscar</label>
-                        <input type="text" class="input" id="search" placeholder="Digite para buscar...">
-                    </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn btn-outline" id="btn-clear-filters">
-                            <i class="fas fa-times"></i> Limpar
-                        </button>
-                        <button class="btn btn-primary" id="btn-apply-filters">
-                            <i class="fas fa-filter"></i> Filtrar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions List -->
-            <div class="actions-list" id="actions-container">
-                <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h3>Nenhuma ação encontrada</h3>
-                    <p>Clique em "Novo Plano de Ação" para adicionar a primeira ação.</p>
-                </div>
-            </div>
-            
-            <!-- Modal Nova Ação -->
-            <div class="modal" id="action-modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="modal-title" id="modal-title">Nova Ação</div>
-                        <button class="modal-close" id="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="action-form">
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label class="form-label">O que será feito *</label>
-                                    <textarea class="form-textarea" id="form-what" required placeholder="Descreva a ação..."></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Justificativa *</label>
-                                    <textarea class="form-textarea" id="form-why" required placeholder="Por que fazer?"></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Responsável *</label>
-                                    <input type="text" class="form-input" id="form-who" required placeholder="Nome do responsável">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Setor *</label>
-                                    <select class="form-select" id="form-area" required>
-                                        <option value="">Selecione</option>
-                                        <option value="SST">SST</option>
-                                        <option value="FINANCEIRO">Financeiro</option>
-                                        <option value="GERENCIA">Gerência</option>
-                                        <option value="SST/FINANCEIRO">SST/Financeiro</option>
-                                        <option value="E-SOCIAL">E-Social</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Local</label>
-                                    <input type="text" class="form-input" id="form-where" placeholder="Onde será feito">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Data Início</label>
-                                    <input type="date" class="form-input" id="form-inicio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Prazo (dias)</label>
-                                    <input type="number" class="form-input" id="form-prazo" min="0" placeholder="Dias">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Custo (R$)</label>
-                                    <input type="number" class="form-input" id="form-custo" min="0" step="0.01" placeholder="0.00">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Prioridade *</label>
-                                    <select class="form-select" id="form-priorizacao" required>
-                                        <option value="Alta">Alta</option>
-                                        <option value="Média">Média</option>
-                                        <option value="Baixa">Baixa</option>
-                                        <option value="Realizado">Realizado</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label">Status *</label>
-                                    <select class="form-select" id="form-status" required>
-                                        <option value="Em Execução">Em Execução</option>
-                                        <option value="Realizado">Realizado</option>
-                                        <option value="Pendente">Pendente</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn btn-danger" id="btn-cancel">Cancelar</button>
-                                <button type="submit" class="btn btn-success" id="btn-save">Salvar Ação</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando...</p>
     </div>
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <!-- Container Principal -->
+    <div class="container" id="main-container">
+        <div class="header">
+            <div class="logo">
+                <h1>Sistema Unificado JSL</h1>
+                <p>Gestão Completa - <span id="current-setor-display">Motorizada</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">AD</div>
+                <div>
+                    <div style="font-weight: 600;" id="current-user">Administrador</div>
+                    <div class="setor-info setor-motorizada" id="current-setor">Motorizada</div>
+                    <div style="font-size: 0.8rem; color: var(--dark-gray);" id="user-role">Administrador</div>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="dashboard-card motorizada">
+                <h3>EPIs Vencidos - Motorizada</h3>
+                <div class="value" id="expired-epis-motorizada">0</div>
+                <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="dashboard-card motorizada">
+                <h3>EPIs a Vencer - Motorizada</h3>
+                <div class="value" id="expiring-epis-motorizada">0</div>
+                <div class="card-icon"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="dashboard-card canteiro">
+                <h3>EPIs Vencidos - Canteiro</h3>
+                <div class="value" id="expired-epis-canteiro">0</div>
+                <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="dashboard-card canteiro">
+                <h3>EPIs a Vencer - Canteiro</h3>
+                <div class="value" id="expiring-epis-canteiro">0</div>
+                <div class="card-icon"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="dashboard-card">
+                <h3>Estoque Baixo</h3>
+                <div class="value" id="low-stock-count">0</div>
+                <div class="card-icon"><i class="fas fa-boxes"></i></div>
+            </div>
+            <div class="dashboard-card">
+                <h3>Ações em Andamento</h3>
+                <div class="value" id="actions-in-progress">0</div>
+                <div class="card-icon"><i class="fas fa-tasks"></i></div>
+            </div>
+        </div>
+
+        <!-- Navegação do Sistema -->
+        <div class="system-navigation">
+            <button class="system-tab active" data-system="epi">
+                <i class="fas fa-hard-hat"></i> Gestão de EPI
+            </button>
+            <button class="system-tab" data-system="w2h">
+                <i class="fas fa-tasks"></i> Sistema 5W2H
+            </button>
+            <button class="system-tab" data-system="admin" id="admin-tab" style="display: none;">
+                <i class="fas fa-users-cog"></i> Administração
+            </button>
+        </div>
+
+        <!-- Sistema de EPI -->
+        <div class="system-content active" id="epi-system">
+            <!-- Seletor de Setor -->
+            <div class="setor-selector">
+                <button class="setor-btn motorizada active" data-setor="motorizada">
+                    <i class="fas fa-motorcycle"></i> Motorizada
+                </button>
+                <button class="setor-btn canteiro" data-setor="canteiro">
+                    <i class="fas fa-tools"></i> Canteiro
+                </button>
+            </div>
+
+            <!-- Abas do EPI -->
+            <div class="tabs">
+                <button class="tab active" data-tab="epi-management">Controle de EPIs</button>
+                <button class="tab" data-tab="epi-stock">Estoque</button>
+                <button class="tab" data-tab="epi-delivery">Entregas</button>
+                <button class="tab" data-tab="epi-reports">Relatórios</button>
+            </div>
+
+            <!-- Gestão de EPIs -->
+            <div class="tab-content active" id="epi-management">
+                <div class="actions">
+                    <div class="search-box">
+                        <input type="text" id="epi-search" placeholder="Buscar por funcionário ou EPI...">
+                        <button id="epi-search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="btn btn-primary" id="add-epi-btn">
+                        <i class="fas fa-plus"></i> Novo EPI
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>EPI</th>
+                                <th>Data Entrega</th>
+                                <th>Data Vencimento</th>
+                                <th>Status</th>
+                                <th>Setor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="epi-table-body">
+                            <!-- Dados serão carregados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Estoque -->
+            <div class="tab-content" id="epi-stock">
+                <div class="actions">
+                    <div class="search-box">
+                        <input type="text" id="stock-search" placeholder="Buscar EPI...">
+                        <button id="stock-search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="btn btn-primary" id="add-stock-btn">
+                        <i class="fas fa-plus"></i> Novo Item
+                    </button>
+                    <button class="btn btn-success" id="generate-stock-report">
+                        <i class="fas fa-file-pdf"></i> Relatório
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>EPI</th>
+                                <th>Quantidade Atual</th>
+                                <th>Quantidade Mínima</th>
+                                <th>Compra Sugerida</th>
+                                <th>Status</th>
+                                <th>Setor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body">
+                            <!-- Dados serão carregados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Entregas -->
+            <div class="tab-content" id="epi-delivery">
+                <div class="actions">
+                    <div class="search-box">
+                        <input type="text" id="delivery-search" placeholder="Buscar por funcionário...">
+                        <button id="delivery-search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="btn btn-primary" id="add-delivery-btn">
+                        <i class="fas fa-plus"></i> Nova Entrega
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th>EPI</th>
+                                <th>Quantidade</th>
+                                <th>Data Entrega</th>
+                                <th>Status</th>
+                                <th>Setor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="delivery-table-body">
+                            <!-- Dados serão carregados aqui -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Relatórios -->
+            <div class="tab-content" id="epi-reports">
+                <div class="actions">
+                    <button class="btn btn-primary" id="generate-epi-report">
+                        <i class="fas fa-file-pdf"></i> Relatório de EPIs
+                    </button>
+                    <button class="btn btn-success" id="generate-stock-report-full">
+                        <i class="fas fa-file-pdf"></i> Relatório de Estoque
+                    </button>
+                    <button class="btn btn-info" id="generate-delivery-report">
+                        <i class="fas fa-file-pdf"></i> Relatório de Entregas
+                    </button>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 12px; margin-top: 20px;">
+                    <h3 style="margin-bottom: 20px; color: var(--primary-color);">Estatísticas</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="text-align: center; padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="total-epis">0</div>
+                            <div style="color: var(--dark-gray);">Total de EPIs</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--accent-color);" id="total-expired">0</div>
+                            <div style="color: var(--dark-gray);">EPIs Vencidos</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--warning-color);" id="total-expiring">0</div>
+                            <div style="color: var(--dark-gray);">EPIs a Vencer</div>
+                        </div>
+                        <div style="text-align: center; padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);" id="total-valid">0</div>
+                            <div style="color: var(--dark-gray);">EPIs Válidos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema 5W2H -->
+        <div class="system-content" id="w2h-system">
+            <div class="actions">
+                <button class="btn btn-primary" id="add-action-btn">
+                    <i class="fas fa-plus"></i> Nova Ação
+                </button>
+                <button class="btn btn-success" id="generate-action-report">
+                    <i class="fas fa-file-pdf"></i> Relatório
+                </button>
+            </div>
+
+            <div id="actions-list">
+                <!-- Ações serão carregadas aqui -->
+            </div>
+        </div>
+
+        <!-- Sistema de Administração -->
+        <div class="system-content" id="admin-system">
+            <div class="admin-panel">
+                <h3><i class="fas fa-users-cog"></i> Gerenciamento de Usuários</h3>
+                <div class="actions">
+                    <button class="btn btn-primary" id="add-user-btn">
+                        <i class="fas fa-user-plus"></i> Novo Usuário
+                    </button>
+                </div>
+                
+                <div class="user-list" id="user-list">
+                    <!-- Lista de usuários será carregada aqui -->
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <h3><i class="fas fa-info-circle"></i> Informações do Sistema</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">Estatísticas Gerais</h4>
+                        <p><strong>Total de Usuários:</strong> <span id="total-users">0</span></p>
+                        <p><strong>Administradores:</strong> <span id="admin-users">0</span></p>
+                        <p><strong>Usuários Comuns:</strong> <span id="common-users">0</span></p>
+                    </div>
+                    <div style="padding: 20px; background: var(--light-gray); border-radius: 8px;">
+                        <h4 style="color: var(--primary-color); margin-bottom: 10px;">Sistema</h4>
+                        <p><strong>Versão:</strong> 2.0</p>
+                        <p><strong>Último Backup:</strong> <span id="last-backup">Nunca</span></p>
+                        <p><strong>Status:</strong> <span style="color: var(--success-color);">● Online</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal EPI -->
+    <div class="modal" id="epi-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="epi-modal-title">Adicionar EPI</h3>
+                <button class="modal-close" id="close-epi-modal">&times;</button>
+            </div>
+            <form id="epi-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="employee-name">Nome do Funcionário</label>
+                        <input type="text" id="employee-name" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="epi-name">Nome do EPI</label>
+                        <input type="text" id="epi-name" class="input" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="delivery-date">Data de Entrega</label>
+                        <input type="date" id="delivery-date" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expiration-date">Data de Vencimento</label>
+                        <input type="date" id="expiration-date" class="input" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-epi" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Estoque -->
+    <div class="modal" id="stock-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="stock-modal-title">Adicionar ao Estoque</h3>
+                <button class="modal-close" id="close-stock-modal">&times;</button>
+            </div>
+            <form id="stock-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stock-epi-name">Nome do EPI</label>
+                        <input type="text" id="stock-epi-name" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock-setor">Setor</label>
+                        <select id="stock-setor" class="input" required>
+                            <option value="motorizada">Motorizada</option>
+                            <option value="canteiro">Canteiro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stock-quantity">Quantidade Atual</label>
+                        <input type="number" id="stock-quantity" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="min-quantity">Quantidade Mínima</label>
+                        <input type="number" id="min-quantity" class="input" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-stock" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Entrega -->
+    <div class="modal" id="delivery-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="delivery-modal-title">Nova Entrega</h3>
+                <button class="modal-close" id="close-delivery-modal">&times;</button>
+            </div>
+            <form id="delivery-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="delivery-employee">Nome do Funcionário</label>
+                        <input type="text" id="delivery-employee" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="delivery-epi">EPI</label>
+                        <select id="delivery-epi" class="input" required>
+                            <option value="">Selecione um EPI</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="delivery-quantity">Quantidade</label>
+                        <input type="number" id="delivery-quantity" class="input" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="delivery-date-input">Data da Entrega</label>
+                        <input type="date" id="delivery-date-input" class="input" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-delivery" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar Entrega</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 5W2H -->
+    <div class="modal" id="action-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="action-modal-title">Nova Ação 5W2H</h3>
+                <button class="modal-close" id="close-action-modal">&times;</button>
+            </div>
+            <form id="action-form">
+                <div class="form-group">
+                    <label for="what">O Que (What)</label>
+                    <textarea id="what" class="input" required placeholder="Descreva o que será feito"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="why">Por Que (Why)</label>
+                    <textarea id="why" class="input" required placeholder="Justificativa da ação"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="where">Onde (Where)</label>
+                        <input type="text" id="where" class="input" required placeholder="Local da ação">
+                    </div>
+                    <div class="form-group">
+                        <label for="who">Quem (Who)</label>
+                        <input type="text" id="who" class="input" required placeholder="Responsável">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start-date">Data de Início</label>
+                        <input type="date" id="start-date" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="deadline-days">Prazo (dias)</label>
+                        <input type="number" id="deadline-days" class="input" required min="1" placeholder="Dias para conclusão">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="how">Como (How)</label>
+                    <textarea id="how" class="input" required placeholder="Como será executado"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="how-much">Quanto (How Much)</label>
+                    <input type="text" id="how-much" class="input" placeholder="Custo estimado">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="action-priority">Prioridade</label>
+                        <select id="action-priority" class="input" required>
+                            <option value="baixa">Baixa</option>
+                            <option value="media">Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="action-status">Status</label>
+                        <select id="action-status" class="input" required>
+                            <option value="pendente">Pendente</option>
+                            <option value="andamento">Em Andamento</option>
+                            <option value="concluido">Concluído</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-action" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Ação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Usuário -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="user-modal-title">Novo Usuário</h3>
+                <button class="modal-close" id="close-user-modal">&times;</button>
+            </div>
+            <form id="user-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="user-name">Nome Completo</label>
+                        <input type="text" id="user-name" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-username">Nome de Usuário</label>
+                        <input type="text" id="user-username" class="input" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="user-password">Senha</label>
+                        <input type="password" id="user-password" class="input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-confirm-password">Confirmar Senha</label>
+                        <input type="password" id="user-confirm-password" class="input" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="user-role">Tipo de Usuário</label>
+                        <select id="user-role" class="input" required>
+                            <option value="user">Usuário Comum</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-setor">Setor de Acesso</label>
+                        <select id="user-setor" class="input" required>
+                            <option value="motorizada">Motorizada</option>
+                            <option value="canteiro">Canteiro</option>
+                            <option value="ambos">Ambos os Setores</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-user" style="background: #6c757d; color: white;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Configuração do Firebase - USANDO SUAS CONFIGURAÇÕES ORIGINAIS
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7lfkugq0bnh0vfbkpu-ZSAvrlvUi-Uos",
-            authDomain: "controleepi-6ccc3.firebaseapp.com",
-            databaseURL: "https://controleepi-6ccc3-default-rtdb.firebaseio.com",
-            projectId: "controleepi-6ccc3",
-            storageBucket: "controleepi-6ccc3.firebasestorage.app",
-            messagingSenderId: "450700628483",
-            appId: "1:450700628483:web:3a5409173a41bb6a307436",
-            measurementId: "G-JX1EMWWFD6"
+        // Sistema de armazenamento local
+        const Storage = {
+            save(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            },
+
+            load(key) {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            },
+
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
         };
 
-        // Inicializar Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.log('Firebase já inicializado');
-        }
-        
-        const database = firebase.database();
-
-        // Inicialização do jsPDF
-        const { jsPDF } = window.jspdf;
-
-        // ========== SISTEMA DE GESTÃO DE EPI ==========
-        // Variáveis globais EPI
-        let epis = [];
-        let estoque = [];
-        let entregas = [];
-        let editandoIndex = -1;
-        let editandoTipo = '';
-        
-        // Elementos DOM EPI
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const saveIndicator = document.getElementById('save-indicator');
-        const connectionStatus = document.getElementById('connection-status');
-        
-        // Modais EPI
-        const modalEpi = document.getElementById('modal-epi');
-        const modalEstoque = document.getElementById('modal-estoque');
-        const modalEntradaEstoque = document.getElementById('modal-entrada-estoque');
-        const modalEntrega = document.getElementById('modal-entrega');
-
-        // ========== SISTEMA 5W2H ==========
-        // Estado da aplicação 5W2H
-        let w2hActions = [];
-        let editingId = null;
-
-        // Elementos DOM 5W2H
-        const actionModal = document.getElementById('action-modal');
-        const actionForm = document.getElementById('action-form');
-        const modalTitle = document.getElementById('modal-title');
-        const modalClose = document.getElementById('modal-close');
-        const btnCancel = document.getElementById('btn-cancel');
-        const btnNewAction = document.getElementById('btn-new-action');
-        const btnRefresh = document.getElementById('btn-refresh');
-        const btnGeneratePdf = document.getElementById('btn-generate-pdf');
-        const btnApplyFilters = document.getElementById('btn-apply-filters');
-        const btnClearFilters = document.getElementById('btn-clear-filters');
-        const toast = document.getElementById('toast');
-        const loading = document.getElementById('loading');
-
-        // Elementos de estatísticas 5W2H
-        const totalActions = document.getElementById('total-actions');
-        const inProgress = document.getElementById('in-progress');
-        const completed = document.getElementById('completed');
-        const overdue = document.getElementById('overdue');
-
-        // Filtros 5W2H
-        const filterPriority = document.getElementById('filter-priority');
-        const filterResponsible = document.getElementById('filter-responsible');
-        const filterArea = document.getElementById('filter-area');
-        const filterStatus = document.getElementById('filter-status');
-        const searchInput = document.getElementById('search');
-
-        // ========== NAVEGAÇÃO ENTRE SISTEMAS ==========
-        const systemTabs = document.querySelectorAll('.system-tab');
-        const systemContents = document.querySelectorAll('.system-content');
-
-        systemTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const systemId = tab.getAttribute('data-system');
-                
-                // Update active system tab
-                systemTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Show corresponding system
-                systemContents.forEach(content => {
-                    content.classList.remove('active');
-                    if (content.id === `${systemId}-system`) {
-                        content.classList.add('active');
-                    }
-                });
-            });
-        });
-
-        // ========== INICIALIZAÇÃO DO SISTEMA ==========
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar ambos os sistemas
-            initializeEPISystem();
-            initialize5W2HSystem();
+        // Estado da aplicação
+        const AppState = {
+            currentUser: null,
+            currentSetor: 'motorizada',
+            currentUserRole: 'user',
+            editingId: null,
             
-            // Esconder loading após um tempo (fallback)
-            setTimeout(() => {
-                hideLoading();
-            }, 3000);
-        });
+            // Dados
+            users: Storage.load('users') || [],
+            epis: Storage.load('epis') || [],
+            stock: Storage.load('stock') || [],
+            deliveries: Storage.load('deliveries') || [],
+            actions: Storage.load('actions') || [],
 
-        // ========== SISTEMA 5W2H ==========
-        function initialize5W2HSystem() {
-            setup5W2HEventListeners();
-            loadW2HActions();
-        }
+            // Inicializar
+            init() {
+                this.setupDefaultUsers();
+                this.loadUserData();
+                this.setupEventListeners();
+                this.loadData();
+                this.setupDefaultData();
+            },
 
-        function setup5W2HEventListeners() {
-            // Modal
-            btnNewAction.addEventListener('click', () => openModal5W2H());
-            modalClose.addEventListener('click', () => closeModal5W2H());
-            btnCancel.addEventListener('click', () => closeModal5W2H());
-            
-            // Formulário
-            actionForm.addEventListener('submit', saveAction5W2H);
-            
-            // Botões
-            btnRefresh.addEventListener('click', loadW2HActions);
-            btnGeneratePdf.addEventListener('click', generatePDF5W2H);
-            btnApplyFilters.addEventListener('click', applyFilters5W2H);
-            btnClearFilters.addEventListener('click', clearFilters5W2H);
-            
-            // Fechar modal ao clicar fora
-            window.addEventListener('click', (e) => {
-                if (e.target === actionModal) {
-                    closeModal5W2H();
+            // Configurar usuários padrão
+            setupDefaultUsers() {
+                if (this.users.length === 0) {
+                    // Usuário administrador padrão
+                    this.users = [
+                        {
+                            id: 'admin',
+                            name: 'Administrador',
+                            username: 'admin',
+                            password: 'admin123',
+                            role: 'admin',
+                            setor: 'ambos',
+                            createdAt: new Date().toISOString(),
+                            active: true
+                        }
+                    ];
+                    Storage.save('users', this.users);
                 }
-            });
+            },
 
-            // Busca em tempo real
-            searchInput.addEventListener('input', applyFilters5W2H);
-        }
+            // Configurar dados padrão
+            setupDefaultData() {
+                if (this.stock.length === 0) {
+                    // Dados de exemplo para estoque
+                    this.stock = [
+                        {
+                            id: '1',
+                            epiName: 'Capacete de Segurança',
+                            quantity: 50,
+                            minQuantity: 20,
+                            setor: 'motorizada',
+                            createdAt: new Date().toISOString()
+                        },
+                        {
+                            id: '2',
+                            epiName: 'Luvas de Proteção',
+                            quantity: 100,
+                            minQuantity: 50,
+                            setor: 'motorizada',
+                            createdAt: new Date().toISOString()
+                        },
+                        {
+                            id: '3',
+                            epiName: 'Botina de Segurança',
+                            quantity: 30,
+                            minQuantity: 25,
+                            setor: 'canteiro',
+                            createdAt: new Date().toISOString()
+                        }
+                    ];
+                    Storage.save('stock', this.stock);
+                }
+            },
 
-        function openModal5W2H(action = null) {
-            editingId = action ? action.id : null;
-            modalTitle.textContent = action ? 'Editar Ação' : 'Nova Ação';
-            
-            if (action) {
-                // Preencher formulário com dados existentes
-                document.getElementById('form-what').value = action.what || '';
-                document.getElementById('form-why').value = action.why || '';
-                document.getElementById('form-who').value = action.who || '';
-                document.getElementById('form-area').value = action.area || '';
-                document.getElementById('form-where').value = action.where || '';
-                document.getElementById('form-inicio').value = action.inicio || '';
-                document.getElementById('form-prazo').value = action.prazo || '';
-                document.getElementById('form-custo').value = action.custo || '';
-                document.getElementById('form-priorizacao').value = action.priorizacao || 'Média';
-                document.getElementById('form-status').value = action.status || 'Em Execução';
-            } else {
-                // Limpar formulário
-                actionForm.reset();
-                document.getElementById('form-priorizacao').value = 'Média';
-                document.getElementById('form-status').value = 'Em Execução';
-            }
-            
-            actionModal.style.display = 'flex';
-        }
-
-        function closeModal5W2H() {
-            actionModal.style.display = 'none';
-            editingId = null;
-            actionForm.reset();
-        }
-
-        function saveAction5W2H(e) {
-            e.preventDefault();
-            
-            const actionData = {
-                what: document.getElementById('form-what').value,
-                why: document.getElementById('form-why').value,
-                who: document.getElementById('form-who').value,
-                area: document.getElementById('form-area').value,
-                where: document.getElementById('form-where').value,
-                inicio: document.getElementById('form-inicio').value,
-                prazo: document.getElementById('form-prazo').value,
-                custo: document.getElementById('form-custo').value,
-                priorizacao: document.getElementById('form-priorizacao').value,
-                status: document.getElementById('form-status').value,
-                updatedAt: new Date().toISOString()
-            };
-            
-            if (!editingId) {
-                actionData.createdAt = new Date().toISOString();
-            }
-            
-            showLoading();
-            
-            if (editingId) {
-                // Atualizar ação existente
-                database.ref(`5w2h/${editingId}`).update(actionData)
-                    .then(() => {
-                        showToast5W2H('Ação atualizada com sucesso!');
-                        closeModal5W2H();
-                    })
-                    .catch(error => {
-                        showToast5W2H('Erro ao atualizar ação: ' + error.message, true);
-                    })
-                    .finally(() => {
-                        hideLoading();
-                    });
-            } else {
-                // Nova ação
-                database.ref('5w2h').push(actionData)
-                    .then(() => {
-                        showToast5W2H('Ação criada com sucesso!');
-                        closeModal5W2H();
-                    })
-                    .catch(error => {
-                        showToast5W2H('Erro ao criar ação: ' + error.message, true);
-                    })
-                    .finally(() => {
-                        hideLoading();
-                    });
-            }
-        }
-
-        function loadW2HActions() {
-            showLoading();
-            
-            database.ref('5w2h').once('value')
-                .then(snapshot => {
-                    w2hActions = [];
-                    const data = snapshot.val();
-                    
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            const action = data[key];
-                            action.id = key;
-                            w2hActions.push(action);
-                        });
-                    }
-                    
-                    renderActions5W2H();
-                    updateStats5W2H();
-                    updateFilterOptions5W2H();
-                })
-                .catch(error => {
-                    console.log('Nenhum dado encontrado no 5W2H, iniciando com array vazio');
-                    w2hActions = [];
-                    renderActions5W2H();
-                })
-                .finally(() => {
-                    hideLoading();
-                });
-        }
-
-        function renderActions5W2H(actions = w2hActions) {
-            const container = document.getElementById('actions-container');
-            
-            if (actions.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h3>Nenhuma ação encontrada</h3>
-                        <p>Clique em "Novo Plano de Ação" para adicionar a primeira ação.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = actions.map(action => {
-                // Adicionar classe 'realizado' quando o status for "Realizado" - FUNDO VERDE CLARINHO
-                const statusClass = action.status === 'Realizado' ? 'realizado' : action.priorizacao?.toLowerCase() || '';
+            // Carregar dados do usuário
+            loadUserData() {
+                const savedUser = localStorage.getItem('currentUser');
+                const savedSetor = localStorage.getItem('currentSetor');
+                const savedRole = localStorage.getItem('currentUserRole');
                 
-                return `
-                    <div class="action-item ${statusClass}" data-id="${action.id}">
-                        <div class="action-header">
-                            <div class="action-title">${action.what || 'Sem título'}</div>
-                            <div class="action-meta">
-                                <span class="badge badge-priority">${action.priorizacao || 'Não definido'}</span>
-                                <span class="badge badge-status">${action.status || 'Pendente'}</span>
+                if (savedUser && savedSetor && savedRole) {
+                    this.currentUser = savedUser;
+                    this.currentSetor = savedSetor;
+                    this.currentUserRole = savedRole;
+                    this.showMainApp();
+                } else {
+                    this.showLogin();
+                }
+            },
+
+            // Configurar event listeners
+            setupEventListeners() {
+                // Login
+                document.getElementById('login-btn').addEventListener('click', () => this.handleLogin());
+                document.getElementById('logout-btn').addEventListener('click', () => this.handleLogout());
+
+                // Navegação
+                document.querySelectorAll('.system-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => this.switchSystem(e.target.dataset.system));
+                });
+
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+                });
+
+                // Setor
+                document.querySelectorAll('.setor-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.switchSetor(e.target.dataset.setor));
+                });
+
+                // Botões de adicionar
+                document.getElementById('add-epi-btn').addEventListener('click', () => this.openEpiModal());
+                document.getElementById('add-stock-btn').addEventListener('click', () => this.openStockModal());
+                document.getElementById('add-delivery-btn').addEventListener('click', () => this.openDeliveryModal());
+                document.getElementById('add-action-btn').addEventListener('click', () => this.openActionModal());
+                document.getElementById('add-user-btn').addEventListener('click', () => this.openUserModal());
+
+                // Fechar modais
+                document.getElementById('close-epi-modal').addEventListener('click', () => this.closeModal('epi'));
+                document.getElementById('cancel-epi').addEventListener('click', () => this.closeModal('epi'));
+                document.getElementById('close-stock-modal').addEventListener('click', () => this.closeModal('stock'));
+                document.getElementById('cancel-stock').addEventListener('click', () => this.closeModal('stock'));
+                document.getElementById('close-delivery-modal').addEventListener('click', () => this.closeModal('delivery'));
+                document.getElementById('cancel-delivery').addEventListener('click', () => this.closeModal('delivery'));
+                document.getElementById('close-action-modal').addEventListener('click', () => this.closeModal('action'));
+                document.getElementById('cancel-action').addEventListener('click', () => this.closeModal('action'));
+                document.getElementById('close-user-modal').addEventListener('click', () => this.closeModal('user'));
+                document.getElementById('cancel-user').addEventListener('click', () => this.closeModal('user'));
+
+                // Formulários
+                document.getElementById('epi-form').addEventListener('submit', (e) => this.handleEpiSubmit(e));
+                document.getElementById('stock-form').addEventListener('submit', (e) => this.handleStockSubmit(e));
+                document.getElementById('delivery-form').addEventListener('submit', (e) => this.handleDeliverySubmit(e));
+                document.getElementById('action-form').addEventListener('submit', (e) => this.handleActionSubmit(e));
+                document.getElementById('user-form').addEventListener('submit', (e) => this.handleUserSubmit(e));
+
+                // Relatórios
+                document.getElementById('generate-stock-report').addEventListener('click', () => this.generateStockReport());
+                document.getElementById('generate-stock-report-full').addEventListener('click', () => this.generateStockReport());
+                document.getElementById('generate-epi-report').addEventListener('click', () => this.generateEPIReport());
+                document.getElementById('generate-delivery-report').addEventListener('click', () => this.generateDeliveryReport());
+                document.getElementById('generate-action-report').addEventListener('click', () => this.generateActionReport());
+
+                // Busca
+                document.getElementById('epi-search-btn').addEventListener('click', () => this.searchEPIs());
+                document.getElementById('stock-search-btn').addEventListener('click', () => this.searchStock());
+                document.getElementById('delivery-search-btn').addEventListener('click', () => this.searchDeliveries());
+            },
+
+            // Carregar dados
+            loadData() {
+                this.renderEPITable();
+                this.renderStockTable();
+                this.renderDeliveryTable();
+                this.renderActionsList();
+                this.renderUsersList();
+                this.updateDashboard();
+                this.updateReportsStats();
+                this.updateAdminStats();
+            },
+
+            // Login
+            handleLogin() {
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                const setor = document.getElementById('login-setor').value;
+
+                const user = this.users.find(u => u.username === username && u.active !== false);
+                
+                if (user && user.password === password) {
+                    // Verificar acesso ao setor
+                    if (user.setor !== 'ambos' && user.setor !== setor) {
+                        this.showToast('Usuário não tem acesso a este setor!', 'error');
+                        return;
+                    }
+
+                    this.currentUser = user.username;
+                    this.currentSetor = setor;
+                    this.currentUserRole = user.role;
+                    
+                    localStorage.setItem('currentUser', user.username);
+                    localStorage.setItem('currentSetor', setor);
+                    localStorage.setItem('currentUserRole', user.role);
+                    
+                    this.showMainApp();
+                    this.showToast(`Bem-vindo, ${user.name}!`);
+                } else {
+                    this.showToast('Usuário ou senha incorretos!', 'error');
+                }
+            },
+
+            // Logout
+            handleLogout() {
+                this.currentUser = null;
+                this.currentSetor = null;
+                this.currentUserRole = 'user';
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentSetor');
+                localStorage.removeItem('currentUserRole');
+                this.showLogin();
+                this.showToast('Logout realizado!');
+            },
+
+            // Mostrar aplicação principal
+            showMainApp() {
+               document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-container').style.display = 'block';
+    
+    const currentUserData = this.users.find(u => u.username === this.currentUser);
+    
+    // Atualizar interface do usuário
+    document.getElementById('current-user').textContent = currentUserData?.name || this.currentUser;
+    document.getElementById('current-setor').textContent = this.currentSetor;
+    document.getElementById('current-setor-display').textContent = this.currentSetor;
+    document.getElementById('user-avatar').textContent = (currentUserData?.name || this.currentUser).substring(0, 2).toUpperCase();
+    document.getElementById('user-role').textContent = this.currentUserRole === 'admin' ? 'Administrador' : 'Usuário';
+    
+    // Atualizar classe do setor
+    const setorElement = document.getElementById('current-setor');
+    setorElement.className = `setor-info setor-${this.currentSetor}`;
+    
+    // CORREÇÃO: Mostrar/ocultar aba de administração
+    const adminTab = document.getElementById('admin-tab');
+    if (this.currentUserRole === 'admin') {
+        adminTab.style.display = 'flex';
+    } else {
+        adminTab.style.display = 'none';
+        // Garantir que não estamos na aba de admin se o usuário não tem permissão
+        if (document.querySelector('[data-system="admin"]').classList.contains('active')) {
+            this.switchSystem('epi'); // Voltar para aba EPI se estava na admin
+        }
+    }
+
+    // Atualizar seletor de setor baseado no acesso do usuário
+    this.updateSetorSelector();
+},
+
+
+            // Atualizar seletor de setor baseado no acesso do usuário
+            updateSetorSelector() {
+                const currentUserData = this.users.find(u => u.username === this.currentUser);
+                const setorSelector = document.querySelector('.setor-selector');
+                
+                if (currentUserData?.setor === 'ambos') {
+                    setorSelector.style.display = 'flex';
+                } else {
+                    setorSelector.style.display = 'none';
+                    // Definir setor fixo para usuários com acesso restrito
+                    this.currentSetor = currentUserData?.setor || 'motorizada';
+                    this.switchSetor(this.currentSetor);
+                }
+            },
+
+            // Mostrar login
+            showLogin() {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('main-container').style.display = 'none';
+            },
+
+            // Trocar sistema
+            switchSystem(system) {
+ // CORREÇÃO: Verificar permissão para acessar admin
+    if (system === 'admin' && this.currentUserRole !== 'admin') {
+        this.showToast('Acesso negado! Você não tem permissão para acessar a administração.', 'error');
+        return;
+    }
+    
+    document.querySelectorAll('.system-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.system-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    document.querySelector(`[data-system="${system}"]`).classList.add('active');
+    document.getElementById(`${system}-system`).classList.add('active');
+
+    if (system === 'admin') {
+        this.renderUsersList();
+        this.updateAdminStats();
+    }
+},
+
+            // Trocar aba
+            switchTab(tab) {
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+                document.getElementById(tab).classList.add('active');
+
+                if (tab === 'epi-delivery') {
+                    this.updateDeliveryEPISelect();
+                }
+            },
+
+            // Trocar setor
+            switchSetor(setor) {
+                this.currentSetor = setor;
+                
+                document.querySelectorAll('.setor-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-setor="${setor}"]`).classList.add('active');
+                
+                // Atualizar interface
+                document.getElementById('current-setor').textContent = setor;
+                document.getElementById('current-setor-display').textContent = setor;
+                const setorElement = document.getElementById('current-setor');
+                setorElement.className = `setor-info setor-${setor}`;
+                
+                // Recarregar dados
+                this.renderEPITable();
+                this.renderStockTable();
+                this.renderDeliveryTable();
+            },
+
+            // Abrir modal EPI
+            openEpiModal(epiId = null) {
+                this.editingId = epiId;
+                const modal = document.getElementById('epi-modal');
+                const form = document.getElementById('epi-form');
+                
+                if (epiId) {
+                    document.getElementById('epi-modal-title').textContent = 'Editar EPI';
+                    const epi = this.epis.find(e => e.id === epiId);
+                    if (epi) {
+                        document.getElementById('employee-name').value = epi.employeeName;
+                        document.getElementById('epi-name').value = epi.epiName;
+                        document.getElementById('delivery-date').value = epi.deliveryDate;
+                        document.getElementById('expiration-date').value = epi.expirationDate;
+                    }
+                } else {
+                    document.getElementById('epi-modal-title').textContent = 'Adicionar EPI';
+                    form.reset();
+                    document.getElementById('delivery-date').value = this.getTodayDate();
+                }
+                
+                modal.style.display = 'flex';
+            },
+
+            // Abrir modal estoque
+            openStockModal(stockId = null) {
+                this.editingId = stockId;
+                const modal = document.getElementById('stock-modal');
+                const form = document.getElementById('stock-form');
+                
+                if (stockId) {
+                    document.getElementById('stock-modal-title').textContent = 'Editar Estoque';
+                    const stock = this.stock.find(s => s.id === stockId);
+                    if (stock) {
+                        document.getElementById('stock-epi-name').value = stock.epiName;
+                        document.getElementById('stock-quantity').value = stock.quantity;
+                        document.getElementById('min-quantity').value = stock.minQuantity;
+                        document.getElementById('stock-setor').value = stock.setor;
+                    }
+                } else {
+                    document.getElementById('stock-modal-title').textContent = 'Adicionar ao Estoque';
+                    form.reset();
+                    document.getElementById('stock-setor').value = this.currentSetor;
+                }
+                
+                modal.style.display = 'flex';
+            },
+
+            // Abrir modal entrega
+            openDeliveryModal() {
+                this.editingId = null;
+                const modal = document.getElementById('delivery-modal');
+                const form = document.getElementById('delivery-form');
+                
+                document.getElementById('delivery-modal-title').textContent = 'Nova Entrega';
+                form.reset();
+                document.getElementById('delivery-date-input').value = this.getTodayDate();
+                
+                this.updateDeliveryEPISelect();
+                modal.style.display = 'flex';
+            },
+
+            // Atualizar select de EPIs para entrega
+            updateDeliveryEPISelect() {
+                const select = document.getElementById('delivery-epi');
+                select.innerHTML = '<option value="">Selecione um EPI</option>';
+                
+                const availableStock = this.stock.filter(item => 
+                    item.setor === this.currentSetor && item.quantity > 0
+                );
+                
+                availableStock.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.epiName} (Disponível: ${item.quantity})`;
+                    select.appendChild(option);
+                });
+            },
+
+            // Abrir modal ação
+            openActionModal(actionId = null) {
+                this.editingId = actionId;
+                const modal = document.getElementById('action-modal');
+                const form = document.getElementById('action-form');
+                
+                if (actionId) {
+                    document.getElementById('action-modal-title').textContent = 'Editar Ação';
+                    const action = this.actions.find(a => a.id === actionId);
+                    if (action) {
+                        document.getElementById('what').value = action.what;
+                        document.getElementById('why').value = action.why;
+                        document.getElementById('where').value = action.where;
+                        document.getElementById('start-date').value = action.startDate;
+                        document.getElementById('deadline-days').value = action.deadlineDays;
+                        document.getElementById('who').value = action.who;
+                        document.getElementById('how').value = action.how;
+                        document.getElementById('how-much').value = action.howMuch || '';
+                        document.getElementById('action-priority').value = action.priority;
+                        document.getElementById('action-status').value = action.status;
+                    }
+                } else {
+                    document.getElementById('action-modal-title').textContent = 'Nova Ação';
+                    form.reset();
+                    document.getElementById('start-date').value = this.getTodayDate();
+                    document.getElementById('deadline-days').value = 7;
+                    document.getElementById('action-status').value = 'pendente';
+                }
+                
+                modal.style.display = 'flex';
+            },
+
+            // Abrir modal usuário
+            openUserModal(userId = null) {
+                this.editingId = userId;
+                const modal = document.getElementById('user-modal');
+                const form = document.getElementById('user-form');
+                
+                if (userId) {
+                    document.getElementById('user-modal-title').textContent = 'Editar Usuário';
+                    const user = this.users.find(u => u.id === userId);
+                    if (user) {
+                        document.getElementById('user-name').value = user.name;
+                        document.getElementById('user-username').value = user.username;
+                        document.getElementById('user-role').value = user.role;
+                        document.getElementById('user-setor').value = user.setor;
+                        // Não preencher senha por segurança
+                    }
+                } else {
+                    document.getElementById('user-modal-title').textContent = 'Novo Usuário';
+                    form.reset();
+                }
+                
+                modal.style.display = 'flex';
+            },
+
+            // Fechar modal
+            closeModal(type) {
+                document.getElementById(`${type}-modal`).style.display = 'none';
+                this.editingId = null;
+            },
+
+            // Manipular EPI
+            handleEpiSubmit(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    employeeName: document.getElementById('employee-name').value,
+                    epiName: document.getElementById('epi-name').value,
+                    deliveryDate: document.getElementById('delivery-date').value,
+                    expirationDate: document.getElementById('expiration-date').value,
+                    setor: this.currentSetor,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                if (this.editingId) {
+                    // Atualizar
+                    const index = this.epis.findIndex(e => e.id === this.editingId);
+                    this.epis[index] = { ...this.epis[index], ...formData };
+                    this.showToast('EPI atualizado com sucesso!');
+                } else {
+                    // Criar novo
+                    formData.id = Storage.generateId();
+                    formData.createdAt = new Date().toISOString();
+                    this.epis.push(formData);
+                    this.showToast('EPI adicionado com sucesso!');
+                }
+                
+                Storage.save('epis', this.epis);
+                this.renderEPITable();
+                this.updateDashboard();
+                this.updateReportsStats();
+                this.closeModal('epi');
+            },
+
+            // Manipular estoque
+            handleStockSubmit(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    epiName: document.getElementById('stock-epi-name').value,
+                    quantity: parseInt(document.getElementById('stock-quantity').value),
+                    minQuantity: parseInt(document.getElementById('min-quantity').value),
+                    setor: document.getElementById('stock-setor').value,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                if (this.editingId) {
+                    // Atualizar
+                    const index = this.stock.findIndex(s => s.id === this.editingId);
+                    this.stock[index] = { ...this.stock[index], ...formData };
+                    this.showToast('Estoque atualizado com sucesso!');
+                } else {
+                    // Criar novo
+                    formData.id = Storage.generateId();
+                    formData.createdAt = new Date().toISOString();
+                    this.stock.push(formData);
+                    this.showToast('Item adicionado ao estoque!');
+                }
+                
+                Storage.save('stock', this.stock);
+                this.renderStockTable();
+                this.updateDashboard();
+                this.closeModal('stock');
+            },
+
+            // Manipular entrega
+            handleDeliverySubmit(e) {
+                e.preventDefault();
+                
+                const stockItemId = document.getElementById('delivery-epi').value;
+                const quantity = parseInt(document.getElementById('delivery-quantity').value);
+                const stockItem = this.stock.find(item => item.id === stockItemId);
+                
+                if (!stockItem) {
+                    this.showToast('EPI não encontrado!', 'error');
+                    return;
+                }
+                
+                if (stockItem.quantity < quantity) {
+                    this.showToast('Quantidade insuficiente em estoque!', 'error');
+                    return;
+                }
+                
+                const formData = {
+                    employeeName: document.getElementById('delivery-employee').value,
+                    epiName: stockItem.epiName,
+                    quantity: quantity,
+                    deliveryDate: document.getElementById('delivery-date-input').value,
+                    stockItemId: stockItemId,
+                    setor: this.currentSetor,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Criar nova entrega
+                formData.id = Storage.generateId();
+                formData.createdAt = new Date().toISOString();
+                this.deliveries.push(formData);
+                
+                // Atualizar estoque
+                stockItem.quantity -= quantity;
+                stockItem.updatedAt = new Date().toISOString();
+                
+                Storage.save('deliveries', this.deliveries);
+                Storage.save('stock', this.stock);
+                
+                this.renderDeliveryTable();
+                this.renderStockTable();
+                this.updateDashboard();
+                this.showToast('Entrega registrada com sucesso!');
+                this.closeModal('delivery');
+            },
+
+            // Manipular ação
+            handleActionSubmit(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    what: document.getElementById('what').value,
+                    why: document.getElementById('why').value,
+                    where: document.getElementById('where').value,
+                    startDate: document.getElementById('start-date').value,
+                    deadlineDays: parseInt(document.getElementById('deadline-days').value),
+                    who: document.getElementById('who').value,
+                    how: document.getElementById('how').value,
+                    howMuch: document.getElementById('how-much').value,
+                    priority: document.getElementById('action-priority').value,
+                    status: document.getElementById('action-status').value,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Calcular data de vencimento
+                const startDate = new Date(formData.startDate);
+                const deadlineDate = new Date(startDate);
+                deadlineDate.setDate(deadlineDate.getDate() + formData.deadlineDays);
+                formData.deadlineDate = deadlineDate.toISOString().split('T')[0];
+                
+                if (this.editingId) {
+                    // Atualizar
+                    const index = this.actions.findIndex(a => a.id === this.editingId);
+                    this.actions[index] = { ...this.actions[index], ...formData };
+                    this.showToast('Ação atualizada com sucesso!');
+                } else {
+                    // Criar novo
+                    formData.id = Storage.generateId();
+                    formData.createdAt = new Date().toISOString();
+                    this.actions.push(formData);
+                    this.showToast('Ação criada com sucesso!');
+                }
+                
+                Storage.save('actions', this.actions);
+                this.renderActionsList();
+                this.updateDashboard();
+                this.closeModal('action');
+            },
+
+            // Manipular usuário
+            handleUserSubmit(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('user-password').value;
+                const confirmPassword = document.getElementById('user-confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    this.showToast('As senhas não coincidem!', 'error');
+                    return;
+                }
+                
+                const formData = {
+                    name: document.getElementById('user-name').value,
+                    username: document.getElementById('user-username').value,
+                    password: password,
+                    role: document.getElementById('user-role').value,
+                    setor: document.getElementById('user-setor').value,
+                    active: true,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Verificar se username já existe (em edição, exceto para o próprio usuário)
+                const existingUser = this.users.find(u => 
+                    u.username === formData.username && u.id !== this.editingId
+                );
+                
+                if (existingUser) {
+                    this.showToast('Nome de usuário já existe!', 'error');
+                    return;
+                }
+                
+                if (this.editingId) {
+                    // Atualizar usuário
+                    const index = this.users.findIndex(u => u.id === this.editingId);
+                    this.users[index] = { ...this.users[index], ...formData };
+                    this.showToast('Usuário atualizado com sucesso!');
+                } else {
+                    // Criar novo usuário
+                    formData.id = Storage.generateId();
+                    formData.createdAt = new Date().toISOString();
+                    this.users.push(formData);
+                    this.showToast('Usuário criado com sucesso!');
+                }
+                
+                Storage.save('users', this.users);
+                this.renderUsersList();
+                this.updateAdminStats();
+                this.closeModal('user');
+            },
+
+            // Renderizar tabela de EPI
+            renderEPITable() {
+                const tbody = document.getElementById('epi-table-body');
+                const filteredEpis = this.epis.filter(epi => epi.setor === this.currentSetor);
+                
+                if (filteredEpis.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-inbox" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                                <p>Nenhum EPI cadastrado</p>
+                                <button class="btn btn-primary" onclick="AppState.openEpiModal()" style="margin-top: 15px;">
+                                    <i class="fas fa-plus"></i> Adicionar Primeiro EPI
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = filteredEpis.map(epi => {
+                    const status = this.getEPIStatus(epi.expirationDate);
+                    const statusClass = this.getEPIStatusClass(status);
+                    const statusText = this.getEPIStatusText(status);
+                    
+                    return `
+                        <tr>
+                            <td>${epi.employeeName}</td>
+                            <td>${epi.epiName}</td>
+                            <td>${this.formatDate(epi.deliveryDate)}</td>
+                            <td>${this.formatDate(epi.expirationDate)}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td><span class="badge-setor badge-${epi.setor}">${epi.setor}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="AppState.openEpiModal('${epi.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="AppState.deleteEPI('${epi.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+
+            // Renderizar tabela de estoque
+            renderStockTable() {
+                const tbody = document.getElementById('stock-table-body');
+                const filteredStock = this.stock.filter(stock => stock.setor === this.currentSetor);
+                
+                if (filteredStock.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-boxes" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                                <p>Nenhum item em estoque</p>
+                                <button class="btn btn-primary" onclick="AppState.openStockModal()" style="margin-top: 15px;">
+                                    <i class="fas fa-plus"></i> Adicionar Primeiro Item
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = filteredStock.map(stock => {
+                    const suggestedPurchase = Math.max(0, stock.minQuantity - stock.quantity);
+                    const status = this.getStockStatus(stock.quantity, stock.minQuantity);
+                    const statusClass = this.getStockStatusClass(status);
+                    const statusText = this.getStockStatusText(status);
+                    
+                    return `
+                        <tr>
+                            <td>${stock.epiName}</td>
+                            <td>${stock.quantity}</td>
+                            <td>${stock.minQuantity}</td>
+                            <td>${suggestedPurchase}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td><span class="badge-setor badge-${stock.setor}">${stock.setor}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="AppState.openStockModal('${stock.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="AppState.deleteStock('${stock.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+
+            // Renderizar tabela de entregas
+            renderDeliveryTable() {
+                const tbody = document.getElementById('delivery-table-body');
+                const filteredDeliveries = this.deliveries.filter(delivery => delivery.setor === this.currentSetor);
+                
+                if (filteredDeliveries.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">
+                                <i class="fas fa-hand-holding" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                                <p>Nenhuma entrega registrada</p>
+                                <button class="btn btn-primary" onclick="AppState.openDeliveryModal()" style="margin-top: 15px;">
+                                    <i class="fas fa-plus"></i> Nova Entrega
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tbody.innerHTML = filteredDeliveries.map(delivery => {
+                    return `
+                        <tr>
+                            <td>${delivery.employeeName}</td>
+                            <td>${delivery.epiName}</td>
+                            <td>${delivery.quantity}</td>
+                            <td>${this.formatDate(delivery.deliveryDate)}</td>
+                            <td><span class="status-badge status-valid">Entregue</span></td>
+                            <td><span class="badge-setor badge-${delivery.setor}">${delivery.setor}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="AppState.deleteDelivery('${delivery.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+
+            // Renderizar lista de ações
+            renderActionsList() {
+                const container = document.getElementById('actions-list');
+                
+                if (this.actions.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; background: white; border-radius: 12px;">
+                            <i class="fas fa-tasks" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                            <p>Nenhuma ação cadastrada</p>
+                            <button class="btn btn-primary" onclick="AppState.openActionModal()" style="margin-top: 15px;">
+                                <i class="fas fa-plus"></i> Criar Primeira Ação
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = this.actions.map(action => {
+                    const status = this.getActionStatus(action);
+                    const statusClass = this.getActionStatusClass(status);
+                    const priorityClass = action.priority === 'alta' ? 'status-expired' : 
+                                        action.priority === 'media' ? 'status-warning' : 'status-valid';
+                    
+                    return `
+                        <div class="action-item ${status}">
+                            <div class="action-header">
+                                <div class="action-title">${action.what}</div>
+                                <div class="action-meta">
+                                    <span class="status-badge ${priorityClass}">${action.priority.toUpperCase()}</span>
+                                    <span class="status-badge ${statusClass}">${status.toUpperCase()}</span>
+                                </div>
+                            </div>
+                            <div class="action-details">
+                                <div class="detail">
+                                    <div class="detail-label">Por que</div>
+                                    <div class="detail-value">${action.why}</div>
+                                </div>
+                                <div class="detail">
+                                    <div class="detail-label">Onde</div>
+                                    <div class="detail-value">${action.where}</div>
+                                </div>
+                                <div class="detail">
+                                    <div class="detail-label">Responsável</div>
+                                    <div class="detail-value">${action.who}</div>
+                                </div>
+                                <div class="detail">
+                                    <div class="detail-label">Início</div>
+                                    <div class="detail-value">${this.formatDate(action.startDate)}</div>
+                                </div>
+                                <div class="detail">
+                                    <div class="detail-label">Prazo</div>
+                                    <div class="detail-value">${this.formatDate(action.deadlineDate)} (${action.deadlineDays} dias)</div>
+                                </div>
+                                <div class="detail">
+                                    <div class="detail-label">Custo</div>
+                                    <div class="detail-value">${action.howMuch || 'Não informado'}</div>
+                                </div>
+                            </div>
+                            <div class="action-footer">
+                                <div>
+                                    <small>Criado em: ${this.formatDate(action.createdAt)}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-success" onclick="AppState.updateActionStatus('${action.id}', 'concluido')">
+                                        <i class="fas fa-check"></i> Concluir
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="AppState.openActionModal('${action.id}')">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="AppState.deleteAction('${action.id}')">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="action-details">
-                            <div class="detail">
-                                <div class="detail-label">Justificativa</div>
-                                <div class="detail-value">${action.why || 'Não informado'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Responsável</div>
-                                <div class="detail-value">${action.who || 'Não definido'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Setor</div>
-                                <div class="detail-value">${action.area || 'Não definido'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Local</div>
-                                <div class="detail-value">${action.where || 'Não informado'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Data Início</div>
-                                <div class="detail-value">${action.inicio ? formatDate5W2H(action.inicio) : 'Não definida'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Prazo</div>
-                                <div class="detail-value">${action.prazo ? action.prazo + ' dias' : 'Não definido'}</div>
-                            </div>
-                            <div class="detail">
-                                <div class="detail-label">Custo</div>
-                                <div class="detail-value">${action.custo ? 'R$ ' + parseFloat(action.custo).toFixed(2) : 'Não informado'}</div>
-                            </div>
+                    `;
+                }).join('');
+            },
+
+            // Renderizar lista de usuários
+            renderUsersList() {
+                const container = document.getElementById('user-list');
+                const activeUsers = this.users.filter(user => user.active !== false);
+                
+                if (activeUsers.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; background: var(--light-gray); border-radius: 8px;">
+                            <i class="fas fa-users" style="font-size: 3rem; color: #ddd; margin-bottom: 15px;"></i>
+                            <p>Nenhum usuário cadastrado</p>
+                            <button class="btn btn-primary" onclick="AppState.openUserModal()" style="margin-top: 15px;">
+                                <i class="fas fa-user-plus"></i> Adicionar Primeiro Usuário
+                            </button>
                         </div>
-                        
-                        <div class="action-footer">
-                            <div class="action-info">
-                                <small class="text-muted">
-                                    Atualizado em: ${action.updatedAt ? formatDate5W2H(action.updatedAt) : 'Nunca'}
-                                </small>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = activeUsers.map(user => {
+                    const setorText = user.setor === 'ambos' ? 'Ambos os Setores' : 
+                                    user.setor === 'motorizada' ? 'Motorizada' : 'Canteiro';
+                    const roleText = user.role === 'admin' ? 'Administrador' : 'Usuário Comum';
+                    const roleColor = user.role === 'admin' ? 'var(--accent-color)' : 'var(--success-color)';
+                    
+                    return `
+                        <div class="user-item">
+                            <div class="user-info-small">
+                                <div class="user-name">${user.name}</div>
+                                <div class="user-details">
+                                    <strong>Usuário:</strong> ${user.username} | 
+                                    <strong>Tipo:</strong> <span style="color: ${roleColor}">${roleText}</span> | 
+                                    <strong>Acesso:</strong> ${setorText}
+                                </div>
+                                <div class="user-details">
+                                    <small>Criado em: ${this.formatDate(user.createdAt)}</small>
+                                </div>
                             </div>
-                            <div class="action-actions">
-                                <button class="btn btn-sm btn-warning btn-edit" onclick="editAction5W2H('${action.id}')">
+                            <div class="user-actions">
+                                <button class="btn btn-sm btn-warning" onclick="AppState.openUserModal('${user.id}')">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
-                                <button class="btn btn-sm btn-danger btn-delete" onclick="deleteAction5W2H('${action.id}')">
+                                ${user.username !== 'admin' ? `
+                                <button class="btn btn-sm btn-danger" onclick="AppState.deleteUser('${user.id}')">
                                     <i class="fas fa-trash"></i> Excluir
                                 </button>
+                                ` : ''}
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
-        }
+                    `;
+                }).join('');
+            },
 
-        function editAction5W2H(actionId) {
-            const action = w2hActions.find(a => a.id === actionId);
-            if (action) openModal5W2H(action);
-        }
+            // Deletar EPI
+            deleteEPI(id) {
+                if (confirm('Tem certeza que deseja excluir este EPI?')) {
+                    this.epis = this.epis.filter(epi => epi.id !== id);
+                    Storage.save('epis', this.epis);
+                    this.renderEPITable();
+                    this.updateDashboard();
+                    this.updateReportsStats();
+                    this.showToast('EPI excluído com sucesso!');
+                }
+            },
 
-        function deleteAction5W2H(actionId) {
-            if (confirm('Tem certeza que deseja excluir esta ação?')) {
-                showLoading();
+            // Deletar estoque
+            deleteStock(id) {
+                if (confirm('Tem certeza que deseja excluir este item do estoque?')) {
+                    this.stock = this.stock.filter(stock => stock.id !== id);
+                    Storage.save('stock', this.stock);
+                    this.renderStockTable();
+                    this.updateDashboard();
+                    this.showToast('Item excluído do estoque!');
+                }
+            },
+
+            // Deletar entrega
+            deleteDelivery(id) {
+                if (confirm('Tem certeza que deseja excluir esta entrega?')) {
+                    const delivery = this.deliveries.find(d => d.id === id);
+                    if (delivery) {
+                        // Devolver ao estoque
+                        const stockItem = this.stock.find(item => item.id === delivery.stockItemId);
+                        if (stockItem) {
+                            stockItem.quantity += delivery.quantity;
+                            Storage.save('stock', this.stock);
+                        }
+                    }
+                    
+                    this.deliveries = this.deliveries.filter(delivery => delivery.id !== id);
+                    Storage.save('deliveries', this.deliveries);
+                    this.renderDeliveryTable();
+                    this.renderStockTable();
+                    this.showToast('Entrega excluída!');
+                }
+            },
+
+            // Deletar ação
+            deleteAction(id) {
+                if (confirm('Tem certeza que deseja excluir esta ação?')) {
+                    this.actions = this.actions.filter(action => action.id !== id);
+                    Storage.save('actions', this.actions);
+                    this.renderActionsList();
+                    this.updateDashboard();
+                    this.showToast('Ação excluída!');
+                }
+            },
+
+            // Deletar usuário
+            deleteUser(id) {
+                const user = this.users.find(u => u.id === id);
+                if (user && user.username === 'admin') {
+                    this.showToast('Não é possível excluir o usuário administrador principal!', 'error');
+                    return;
+                }
                 
-                database.ref(`5w2h/${actionId}`).remove()
-                    .then(() => {
-                        showToast5W2H('Ação excluída com sucesso!');
-                        loadW2HActions();
-                    })
-                    .catch(error => {
-                        showToast5W2H('Erro ao excluir ação: ' + error.message, true);
-                    })
-                    .finally(() => {
-                        hideLoading();
-                    });
-            }
-        }
+                if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                    // Marcar como inativo em vez de excluir completamente
+                    const index = this.users.findIndex(u => u.id === id);
+                    this.users[index].active = false;
+                    this.users[index].updatedAt = new Date().toISOString();
+                    
+                    Storage.save('users', this.users);
+                    this.renderUsersList();
+                    this.updateAdminStats();
+                    this.showToast('Usuário excluído com sucesso!');
+                }
+            },
 
-        function updateStats5W2H() {
-            const total = w2hActions.length;
-            const inProgressCount = w2hActions.filter(a => a.status === 'Em Execução').length;
-            const completedCount = w2hActions.filter(a => a.status === 'Realizado').length;
-            const overdueCount = w2hActions.filter(a => {
-                if (!a.inicio || !a.prazo || a.status === 'Realizado') return false;
+            // Atualizar status da ação
+            updateActionStatus(id, status) {
+                const action = this.actions.find(a => a.id === id);
+                if (action) {
+                    action.status = status;
+                    action.updatedAt = new Date().toISOString();
+                    Storage.save('actions', this.actions);
+                    this.renderActionsList();
+                    this.updateDashboard();
+                    this.showToast('Status da ação atualizado!');
+                }
+            },
+
+            // Atualizar dashboard
+            updateDashboard() {
+                const now = new Date();
+                const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
                 
-                const startDate = new Date(a.inicio);
-                const dueDate = new Date(startDate.getTime() + (a.prazo * 24 * 60 * 60 * 1000));
-                return dueDate < new Date();
-            }).length;
-            
-            totalActions.textContent = total;
-            inProgress.textContent = inProgressCount;
-            completed.textContent = completedCount;
-            overdue.textContent = overdueCount;
-        }
+                // EPIs por setor
+                const motorizadaEpis = this.epis.filter(epi => epi.setor === 'motorizada');
+                const canteiroEpis = this.epis.filter(epi => epi.setor === 'canteiro');
+                
+                const expiredMotorizada = motorizadaEpis.filter(epi => new Date(epi.expirationDate) < now).length;
+                const expiringMotorizada = motorizadaEpis.filter(epi => {
+                    const expDate = new Date(epi.expirationDate);
+                    return expDate >= now && expDate <= thirtyDaysFromNow;
+                }).length;
+                
+                const expiredCanteiro = canteiroEpis.filter(epi => new Date(epi.expirationDate) < now).length;
+                const expiringCanteiro = canteiroEpis.filter(epi => {
+                    const expDate = new Date(epi.expirationDate);
+                    return expDate >= now && expDate <= thirtyDaysFromNow;
+                }).length;
+                
+                // Estoque baixo
+                const lowStock = this.stock.filter(item => item.quantity <= item.minQuantity).length;
+                
+                // Ações em andamento
+                const actionsInProgress = this.actions.filter(action => 
+                    action.status === 'andamento' || action.status === 'pendente'
+                ).length;
+                
+                document.getElementById('expired-epis-motorizada').textContent = expiredMotorizada;
+                document.getElementById('expiring-epis-motorizada').textContent = expiringMotorizada;
+                document.getElementById('expired-epis-canteiro').textContent = expiredCanteiro;
+                document.getElementById('expiring-epis-canteiro').textContent = expiringCanteiro;
+                document.getElementById('low-stock-count').textContent = lowStock;
+                document.getElementById('actions-in-progress').textContent = actionsInProgress;
+            },
 
-        function updateFilterOptions5W2H() {
-            // Responsáveis
-            const responsibles = [...new Set(w2hActions.map(a => a.who).filter(Boolean))];
-            const responsibleSelect = document.getElementById('filter-responsible');
-            responsibleSelect.innerHTML = '<option value="all">Todos</option>' + 
-                responsibles.map(r => `<option value="${r}">${r}</option>`).join('');
-            
-            // Setores
-            const areas = [...new Set(w2hActions.map(a => a.area).filter(Boolean))];
-            const areaSelect = document.getElementById('filter-area');
-            areaSelect.innerHTML = '<option value="all">Todos</option>' + 
-                areas.map(a => `<option value="${a}">${a}</option>`).join('');
-        }
+            // Atualizar estatísticas dos relatórios
+            updateReportsStats() {
+                const now = new Date();
+                const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+                
+                const allEpis = this.epis;
+                const totalEpis = allEpis.length;
+                const totalExpired = allEpis.filter(epi => new Date(epi.expirationDate) < now).length;
+                const totalExpiring = allEpis.filter(epi => {
+                    const expDate = new Date(epi.expirationDate);
+                    return expDate >= now && expDate <= thirtyDaysFromNow;
+                }).length;
+                const totalValid = totalEpis - totalExpired - totalExpiring;
+                
+                document.getElementById('total-epis').textContent = totalEpis;
+                document.getElementById('total-expired').textContent = totalExpired;
+                document.getElementById('total-expiring').textContent = totalExpiring;
+                document.getElementById('total-valid').textContent = totalValid;
+            },
 
-        function applyFilters5W2H() {
-            let filtered = [...w2hActions];
-            
-            // Filtro de prioridade
-            if (filterPriority.value !== 'all') {
-                filtered = filtered.filter(a => a.priorizacao === filterPriority.value);
-            }
-            
-            // Filtro de responsável
-            if (filterResponsible.value !== 'all') {
-                filtered = filtered.filter(a => a.who === filterResponsible.value);
-            }
-            
-            // Filtro de setor
-            if (filterArea.value !== 'all') {
-                filtered = filtered.filter(a => a.area === filterArea.value);
-            }
-            
-            // Filtro de status
-            if (filterStatus.value !== 'all') {
-                filtered = filtered.filter(a => a.status === filterStatus.value);
-            }
-            
-            // Filtro de busca
-            if (searchInput.value) {
-                const searchTerm = searchInput.value.toLowerCase();
-                filtered = filtered.filter(a => 
-                    (a.what && a.what.toLowerCase().includes(searchTerm)) ||
-                    (a.why && a.why.toLowerCase().includes(searchTerm)) ||
-                    (a.who && a.who.toLowerCase().includes(searchTerm)) ||
-                    (a.area && a.area.toLowerCase().includes(searchTerm))
-                );
-            }
-            
-            renderActions5W2H(filtered);
-        }
+            // Atualizar estatísticas de administração
+            updateAdminStats() {
+                const activeUsers = this.users.filter(user => user.active !== false);
+                const adminUsers = activeUsers.filter(user => user.role === 'admin');
+                const commonUsers = activeUsers.filter(user => user.role === 'user');
+                
+                document.getElementById('total-users').textContent = activeUsers.length;
+                document.getElementById('admin-users').textContent = adminUsers.length;
+                document.getElementById('common-users').textContent = commonUsers.length;
+            },
 
-        function clearFilters5W2H() {
-            filterPriority.value = 'all';
-            filterResponsible.value = 'all';
-            filterArea.value = 'all';
-            filterStatus.value = 'all';
-            searchInput.value = '';
-            renderActions5W2H();
-        }
-
-        function generatePDF5W2H() {
-            showToast5W2H('Gerando PDF...');
-            // Implementação do PDF será adicionada posteriormente
-        }
-
-        function formatDate5W2H(dateString) {
-            if (!dateString) return 'Não definida';
-            
-            try {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('pt-BR');
-            } catch (e) {
-                return dateString;
-            }
-        }
-
-        function showToast5W2H(message, isError = false) {
-            toast.textContent = message;
-            toast.className = 'toast' + (isError ? ' error' : '');
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // ========== SISTEMA EPI (SIMPLIFICADO PARA TESTE) ==========
-        function initializeEPISystem() {
-            // Configurações básicas do sistema EPI
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
-                    abrirTab(tabId);
+            // Buscar EPIs
+            searchEPIs() {
+                const term = document.getElementById('epi-search').value.toLowerCase();
+                const rows = document.querySelectorAll('#epi-table-body tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
                 });
-            });
-            
-            // Inicializar com dados vazios
-            renderizarTabelas();
-        }
+            },
 
-        function abrirTab(tabId) {
-            tabs.forEach(tab => tab.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-            
-            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        }
+            // Buscar estoque
+            searchStock() {
+                const term = document.getElementById('stock-search').value.toLowerCase();
+                const rows = document.querySelectorAll('#stock-table-body tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            },
 
-        function renderizarTabelas() {
-            renderizarTabelaEPIs();
-            renderizarTabelaEstoque();
-            renderizarTabelaEntregas();
-        }
+            // Buscar entregas
+            searchDeliveries() {
+                const term = document.getElementById('delivery-search').value.toLowerCase();
+                const rows = document.querySelectorAll('#delivery-table-body tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            },
 
-        function renderizarTabelaEPIs() {
-            const tbody = document.querySelector('#tabela-epis tbody');
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; font-style: italic;">Nenhum EPI cadastrado. Clique em "Adicionar EPI" para começar.</td></tr>';
-        }
+            // Gerar relatório de estoque
+            generateStockReport() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Cabeçalho
+                doc.setFillColor(44, 62, 80);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('RELATÓRIO DE ESTOQUE - JSL', 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 105, 22, { align: 'center' });
+                
+                // Dados da tabela
+                const tableColumn = ["EPI", "Quantidade", "Mínimo", "Compra Sugerida", "Status", "Setor"];
+                const tableRows = this.stock.map(item => {
+                    const suggestedPurchase = Math.max(0, item.minQuantity - item.quantity);
+                    const status = this.getStockStatus(item.quantity, item.minQuantity);
+                    const statusText = this.getStockStatusText(status);
+                    
+                    return [
+                        item.epiName,
+                        item.quantity.toString(),
+                        item.minQuantity.toString(),
+                        suggestedPurchase.toString(),
+                        statusText,
+                        item.setor
+                    ];
+                });
+                
+                // Adicionar tabela
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 35,
+                    theme: 'grid',
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [52, 152, 219] }
+                });
+                
+                doc.save(`relatorio_estoque_${new Date().toISOString().split('T')[0]}.pdf`);
+                this.showToast('Relatório de estoque gerado!');
+            },
 
-        function renderizarTabelaEstoque() {
-            const tbody = document.querySelector('#tabela-estoque tbody');
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; font-style: italic;">Nenhum item no estoque. Clique em "Adicionar ao Estoque" para começar.</td></tr>';
-        }
+            // Gerar relatório de EPIs
+            generateEPIReport() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFillColor(44, 62, 80);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('RELATÓRIO DE EPIs - JSL', 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 105, 22, { align: 'center' });
+                
+                const tableColumn = ["Funcionário", "EPI", "Data Entrega", "Data Vencimento", "Status", "Setor"];
+                const tableRows = this.epis.map(epi => {
+                    const status = this.getEPIStatus(epi.expirationDate);
+                    const statusText = this.getEPIStatusText(status);
+                    
+                    return [
+                        epi.employeeName,
+                        epi.epiName,
+                        this.formatDate(epi.deliveryDate),
+                        this.formatDate(epi.expirationDate),
+                        statusText,
+                        epi.setor
+                    ];
+                });
+                
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 35,
+                    theme: 'grid',
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [52, 152, 219] }
+                });
+                
+                doc.save(`relatorio_epis_${new Date().toISOString().split('T')[0]}.pdf`);
+                this.showToast('Relatório de EPIs gerado!');
+            },
 
-        function renderizarTabelaEntregas() {
-            const tbody = document.querySelector('#tabela-entregas tbody');
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; font-style: italic;">Nenhuma entrega registrada. Clique em "Nova Entrega" para começar.</td></tr>';
-        }
+            // Gerar relatório de entregas
+            generateDeliveryReport() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFillColor(44, 62, 80);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('RELATÓRIO DE ENTREGAS - JSL', 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 105, 22, { align: 'center' });
+                
+                const tableColumn = ["Funcionário", "EPI", "Quantidade", "Data Entrega", "Setor"];
+                const tableRows = this.deliveries.map(delivery => [
+                    delivery.employeeName,
+                    delivery.epiName,
+                    delivery.quantity.toString(),
+                    this.formatDate(delivery.deliveryDate),
+                    delivery.setor
+                ]);
+                
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 35,
+                    theme: 'grid',
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [52, 152, 219] }
+                });
+                
+                doc.save(`relatorio_entregas_${new Date().toISOString().split('T')[0]}.pdf`);
+                this.showToast('Relatório de entregas gerado!');
+            },
 
-        // ========== FUNÇÕES GLOBAIS ==========
-        function showLoading() {
-            loading.style.display = 'flex';
-        }
+            // Gerar relatório de ações
+            generateActionReport() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFillColor(44, 62, 80);
+                doc.rect(0, 0, 210, 30, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(20);
+                doc.text('RELATÓRIO DE AÇÕES 5W2H - JSL', 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 105, 22, { align: 'center' });
+                
+                const tableColumn = ["O Que", "Responsável", "Início", "Prazo", "Prioridade", "Status"];
+                const tableRows = this.actions.map(action => {
+                    const status = this.getActionStatus(action);
+                    
+                    return [
+                        action.what.substring(0, 30) + (action.what.length > 30 ? '...' : ''),
+                        action.who,
+                        this.formatDate(action.startDate),
+                        this.formatDate(action.deadlineDate),
+                        action.priority,
+                        status
+                    ];
+                });
+                
+                doc.autoTable({
+                    head: [tableColumn],
+                    body: tableRows,
+                    startY: 35,
+                    theme: 'grid',
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [52, 152, 219] }
+                });
+                
+                doc.save(`relatorio_acoes_${new Date().toISOString().split('T')[0]}.pdf`);
+                this.showToast('Relatório de ações gerado!');
+            },
 
-        function hideLoading() {
-            loading.style.display = 'none';
-        }
+            // Utilitários
+            getTodayDate() {
+                return new Date().toISOString().split('T')[0];
+            },
 
-        // Monitorar status da conexão
-        database.ref('.info/connected').on('value', (snapshot) => {
-            if (snapshot.val() === true) {
-                connectionStatus.textContent = '✅ Online';
-                connectionStatus.className = 'connection-status connection-online';
-            } else {
-                connectionStatus.textContent = '❌ Offline';
-                connectionStatus.className = 'connection-status connection-offline';
+            formatDate(dateString) {
+                if (!dateString) return '-';
+                return new Date(dateString).toLocaleDateString('pt-BR');
+            },
+
+            getEPIStatus(expirationDate) {
+                const today = new Date();
+                const expDate = new Date(expirationDate);
+                const diffTime = expDate.getTime() - today.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) return 'expired';
+                if (diffDays <= 30) return 'warning';
+                return 'valid';
+            },
+
+            getEPIStatusClass(status) {
+                switch (status) {
+                    case 'expired': return 'status-expired';
+                    case 'warning': return 'status-warning';
+                    default: return 'status-valid';
+                }
+            },
+
+            getEPIStatusText(status) {
+                switch (status) {
+                    case 'expired': return 'Vencido';
+                    case 'warning': return 'A Vencer';
+                    default: return 'Válido';
+                }
+            },
+
+            getStockStatus(quantity, minQuantity) {
+                if (quantity === 0) return 'out-of-stock';
+                if (quantity <= minQuantity) return 'low-stock';
+                return 'ok';
+            },
+
+            getStockStatusClass(status) {
+                switch (status) {
+                    case 'out-of-stock': return 'status-expired';
+                    case 'low-stock': return 'status-warning';
+                    default: return 'status-valid';
+                }
+            },
+
+            getStockStatusText(status) {
+                switch (status) {
+                    case 'out-of-stock': return 'Sem Estoque';
+                    case 'low-stock': return 'Estoque Baixo';
+                    default: return 'Estoque OK';
+                }
+            },
+
+            getActionStatus(action) {
+                if (action.status === 'concluido') return 'concluido';
+                
+                const today = new Date();
+                const deadline = new Date(action.deadlineDate);
+                
+                if (today > deadline) return 'atrasado';
+                if (action.status === 'andamento') return 'andamento';
+                return 'pendente';
+            },
+
+            getActionStatusClass(status) {
+                switch (status) {
+                    case 'concluido': return 'status-valid';
+                    case 'atrasado': return 'status-expired';
+                    case 'andamento': return 'status-warning';
+                    default: return 'status-warning';
+                }
+            },
+
+            // Toast
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
             }
+        };
+
+        // Inicializar aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            AppState.init();
         });
 
-        // Funções globais para acesso externo
-        window.editAction5W2H = editAction5W2H;
-        window.deleteAction5W2H = deleteAction5W2H;
-        window.filtrarEPIs = function() { };
-        window.filtrarEstoque = function() { };
-        window.filtrarEntregas = function() { };
+        // Funções globais para os botões
+        window.AppState = AppState;
     </script>
 </body>
 </html>

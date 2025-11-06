@@ -1971,51 +1971,53 @@
                 e.preventDefault();
                 
                 const password = document.getElementById('user-password').value;
-                const confirmPassword = document.getElementById('user-confirm-password').value;
-                
-                if (password !== confirmPassword) {
-                    this.showToast('As senhas não coincidem!', 'error');
-                    return;
-                }
-                
-                const formData = {
-                    name: document.getElementById('user-name').value,
-                    username: document.getElementById('user-username').value,
-                    password: password,
-                    role: document.getElementById('user-role').value,
-                    setor: document.getElementById('user-setor').value,
-                    active: true,
-                    updatedAt: new Date().toISOString()
-                };
-                
-                // Verificar se username já existe (em edição, exceto para o próprio usuário)
-                const existingUser = this.users.find(u => 
-                    u.username === formData.username && u.id !== this.editingId
-                );
-                
-                if (existingUser) {
-                    this.showToast('Nome de usuário já existe!', 'error');
-                    return;
-                }
-                
-                if (this.editingId) {
-                    // Atualizar usuário
-                    const index = this.users.findIndex(u => u.id === this.editingId);
-                    this.users[index] = { ...this.users[index], ...formData };
-                    this.showToast('Usuário atualizado com sucesso!');
-                } else {
-                    // Criar novo usuário
-                    formData.id = Storage.generateId();
-                    formData.createdAt = new Date().toISOString();
-                    this.users.push(formData);
-                    this.showToast('Usuário criado com sucesso!');
-                }
-                
-                Storage.save('users', this.users);
-                this.renderUsersList();
-                this.updateAdminStats();
-                this.closeModal('user');
-            },
+    const confirmPassword = document.getElementById('user-confirm-password').value;
+    
+    if (password !== confirmPassword) {
+        this.showToast('As senhas não coincidem!', 'error');
+        return;
+    }
+    
+    const formData = {
+        name: document.getElementById('user-name').value,
+        username: document.getElementById('user-username').value,
+        password: password,
+        role: document.getElementById('user-role').value,
+        setor: document.getElementById('user-setor').value,
+        active: true,
+        updatedAt: new Date().toISOString()
+    };
+    
+    // CORREÇÃO: Verificar se username já existe (apenas usuários ativos)
+    const existingUser = this.users.find(u => 
+        u.username === formData.username && 
+        u.id !== this.editingId && 
+        u.active !== false
+    );
+    
+    if (existingUser) {
+        this.showToast('Nome de usuário já existe!', 'error');
+        return;
+    }
+    
+    if (this.editingId) {
+        // Atualizar usuário
+        const index = this.users.findIndex(u => u.id === this.editingId);
+        this.users[index] = { ...this.users[index], ...formData };
+        this.showToast('Usuário atualizado com sucesso!');
+    } else {
+        // Criar novo usuário
+        formData.id = Storage.generateId();
+        formData.createdAt = new Date().toISOString();
+        this.users.push(formData);
+        this.showToast('Usuário criado com sucesso!');
+    }
+    
+    Storage.save('users', this.users);
+    this.renderUsersList();
+    this.updateAdminStats();
+    this.closeModal('user');
+},
 
             // Renderizar tabela de EPI
             renderEPITable() {
@@ -2338,23 +2340,23 @@
             // Deletar usuário
             deleteUser(id) {
                 const user = this.users.find(u => u.id === id);
-                if (user && user.username === 'admin') {
-                    this.showToast('Não é possível excluir o usuário administrador principal!', 'error');
-                    return;
-                }
-                
-                if (confirm('Tem certeza que deseja excluir este usuário?')) {
-                    // Marcar como inativo em vez de excluir completamente
-                    const index = this.users.findIndex(u => u.id === id);
-                    this.users[index].active = false;
-                    this.users[index].updatedAt = new Date().toISOString();
-                    
-                    Storage.save('users', this.users);
-                    this.renderUsersList();
-                    this.updateAdminStats();
-                    this.showToast('Usuário excluído com sucesso!');
-                }
-            },
+    if (user && user.username === 'admin') {
+        this.showToast('Não é possível excluir o usuário administrador principal!', 'error');
+        return;
+    }
+    
+    if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        // Marcar como inativo em vez de excluir completamente
+        const index = this.users.findIndex(u => u.id === id);
+        this.users[index].active = false;  // ← Isso deve estar como false
+        this.users[index].updatedAt = new Date().toISOString();
+        
+        Storage.save('users', this.users);
+        this.renderUsersList();
+        this.updateAdminStats();
+        this.showToast('Usuário excluído com sucesso!');
+    }
+},
 
             // Atualizar status da ação
             updateActionStatus(id, status) {

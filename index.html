@@ -1611,7 +1611,7 @@
 
             // Trocar sistema
             switchSystem(system) {
- // CORREÇÃO: Verificar permissão para acessar admin
+  // CORREÇÃO: Verificar permissão para acessar admin
     if (system === 'admin' && this.currentUserRole !== 'admin') {
         this.showToast('Acesso negado! Você não tem permissão para acessar a administração.', 'error');
         return;
